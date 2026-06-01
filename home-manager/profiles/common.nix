@@ -36,7 +36,7 @@ with lib;
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks = {
+      settings = {
         "nc" = {
           port = 2522;
           identityFile = "~/.ssh/id_ed25519";
