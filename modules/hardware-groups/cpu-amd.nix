@@ -11,11 +11,13 @@ in {
       kernelParams = [
         "amd_iommu=on"
         "amd_pstate=active"
-        "amdgpu.runpm=0" "amdgpu.dcdebugmask=0x10"
-        # "amdgpu.dc=1" # display code experimental support
+        "amdgpu.gpu_recovery=1"
+        # "amdgpu.runpm=0"
+        # "amdgpu.dcdebugmask=0x10" # disable panel power saver refresh
+        "amdgpu.dc=1" # Enable display Core (always reccommended)
         # "amdgpu.dpm=0" # dynamic power management
         # "amdgpu.mcbp=0" # memory clock bypass
-        # "amdgpu.dcfeaturemask=0x8" # enable display powersaving?
+        # "amdgpu.dcfeaturemask=0x8" # enable display power saver refresh
         # "amdgpu.dcdebugmask=0x10" # disable powersaving?, enable if crashes / issue / artifacts of the display, especially after hibernate/suspend
         # "amdgpu.sg_display=0" # enable if the screen flickers or stays white, not needed in kernel >=6.6
         # "radeon.cik_support=0" # for Sea islands (CIK) GPUs
