@@ -42,6 +42,10 @@
       # inputs.nixpkgs.follows = "nixpkgs";
       flake = false;
     };
+    helix-notes={
+      url = "git+https://codeberg.org/ArkHost/HelixNotes";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     ucodenix.url = "github:e-tho/ucodenix";
     # vscode-server = {
     #   url = "github:msteen/nixos-vscode-server";
@@ -120,6 +124,7 @@
       nur,
       nixgl,
       NixVirt,
+      helix-notes,
       # simple-nixos-mailserver,
       ...
     }@inputs:

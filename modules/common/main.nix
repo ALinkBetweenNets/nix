@@ -3,6 +3,7 @@
   pkgs,
   lib,
   flake-self,
+  helix-notes,
   ...
 }:
 with lib;
@@ -80,6 +81,7 @@ in
       cpio
       net-tools
       link.precomp
+      (helix-notes.packages.${pkgs.stdenv.hostPlatform.system}.default)
     ];
     services.netbird.enable = true;
     systemd.services.netbird.wantedBy = lib.mkForce [ ];
