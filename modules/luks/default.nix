@@ -38,7 +38,6 @@ in
       kernelParams = [ "ip=dhcp" ];
       ## This enables initrd to run a ssh server for entering the password for luks decryption
       initrd = {
-        systemd.users.root.shell = lib.mkForce "/bin/systemctl default";
         # secrets = {
         #   "/etc/secrets/initrd/ed25519.key" = /etc/secrets/initrd/ed25519.key;
         # };
