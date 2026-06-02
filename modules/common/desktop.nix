@@ -4,7 +4,6 @@
   flake-self,
   pkgs,
   lib,
-  ghostty,
   ...
 }:
 with lib;
@@ -60,7 +59,6 @@ in
       ]
       ++ lib.optionals (config.nixpkgs.hostPlatform.system == "x86_64-linux") [
         # cobang
-        ghostty.packages.x86_64-linux.default
       ]
       ++ lib.optionals (config.link.podman.enable) [
         pods

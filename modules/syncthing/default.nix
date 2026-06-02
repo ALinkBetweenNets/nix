@@ -1,15 +1,15 @@
 {
-  config,
-  system-config,
-  pkgs,
-  lib,
-  ...
+config,
+system-config,
+pkgs,
+lib,
+...
 }:
 with lib;
 let
   cfg = config.link.syncthing;
 in
-{
+  {
   options.link.syncthing.enable = mkEnableOption "activate syncthing";
   config = mkIf cfg.enable {
     # systemd.tmpfiles.rules = [ "d /var/lib/syncthing 1700 l wheel -" ];
@@ -24,12 +24,17 @@ in
       ];
     };
     environment.systemPackages = with pkgs; [ syncthing ];
+    systemd.services.syncthing.environment = { GOMAXPROCS="1";};
     services.syncthing = {
       enable = true;
       user = "l";
       openDefaultPorts = true;
       dataDir = config.link.syncthingDir;
       settings = {
+        setLowPriority = true;
+        maxFolderConcurrency=1;
+        globalAnnounceEnabled=false;
+        relaysEnabled=false;
         extraOptions.gui = {
           theme = "black";
           user = "l";

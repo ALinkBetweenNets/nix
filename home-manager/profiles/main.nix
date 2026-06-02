@@ -89,6 +89,7 @@ with lib; {
       # bitwarden-cli
       nextcloud-client
       pympress
+      ghostty
       zotero
       openai-whisper # transcription
       ripgrep-all # also search pdfs, ebooks, office docs, zip, tar.gz
