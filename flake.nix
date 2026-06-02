@@ -69,6 +69,7 @@
     nixgl = {
       url = "github:guibou/nixGL";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
     # simple-nixos-mailserver.url = "gitlab:simple-nixos-mailserver/nixos-mailserver/nixos-22.11";
     plasma-manager = {
@@ -100,14 +101,14 @@
       url = "github:StevenBlack/hosts";
       flake = false;
     };
-    mayniklas = {
-      url = "github:MayNiklas/nixos";
-      inputs = {
-        disko.follows = "disko";
-        home-manager.follows = "home-manager";
-        nixpkgs.follows = "nixpkgs";
-      };
-    };
+    # mayniklas = {
+    #   url = "github:MayNiklas/nixos";
+    #   inputs = {
+    #     disko.follows = "disko";
+    #     home-manager.follows = "home-manager";
+    #     nixpkgs.follows = "nixpkgs";
+    #   };
+    # };
     grub2-themes = {
       url = "github:paulmiro/grub2-themes";
     };
