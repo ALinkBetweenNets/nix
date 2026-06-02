@@ -53,7 +53,6 @@
     mongodbPackage = pkgs.mongodb;
 
   };
-  nixpkgs.config.permittedInsecurePackages = [ "unifi-controller-7.5.187" ];
   networking = {
     hostName = "dn";
     domain = "monitor-banfish.ts.net";

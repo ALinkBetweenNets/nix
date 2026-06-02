@@ -155,7 +155,6 @@
   #powerManagement.scsiLinkPolicy = "med_power_with_dipm";
   # systemd.extraConfig = "DefaultLimitNOFILE=2048";
   # security.protectKernelImage = false;
-  nixpkgs.config.permittedInsecurePackages = [ "unifi-controller-7.5.187" ];
   environment.systemPackages = with pkgs; [
     kdePackages.frameworkintegration
     framework-tool-tui
