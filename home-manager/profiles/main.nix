@@ -87,6 +87,7 @@ with lib; {
 
     home.packages = with pkgs; [
       # bitwarden-cli
+      claude-code
       nextcloud-client
       pympress
       ghostty

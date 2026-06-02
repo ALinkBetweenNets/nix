@@ -38,34 +38,35 @@ in
           with pkgs.vscode-extensions;
           [
             # continue.continue # ollama
-            myriad-dreamin.tinymist # typst
+            # bradlc.vscode-tailwindcss
+            # christian-kohler.npm-intellisense
+            # dbaeumer.vscode-eslint
+            # dracula-theme.theme-dracula
+            # firefox-devtools.vscode-firefox-debug
+            # gitlab.gitlab-workflow
+            # usernamehw.errorlens
+            # yoavbls.pretty-ts-errors
             #b4dm4n.vscode-nixpkgs-fmt
             #vscodevim.vim
+            anthropic.claude-code
             arrterian.nix-env-selector
-            # dracula-theme.theme-dracula
             christian-kohler.path-intellisense
-            # dbaeumer.vscode-eslint
-            # christian-kohler.npm-intellisense
-            # yoavbls.pretty-ts-errors
-            # bradlc.vscode-tailwindcss
             eamodio.gitlens
             esbenp.prettier-vscode
-            # firefox-devtools.vscode-firefox-debug
             github.copilot
             github.copilot-chat
             github.vscode-github-actions
             github.vscode-pull-request-github
-            # gitlab.gitlab-workflow
             gruntfuggly.todo-tree
             jnoortheen.nix-ide
             mkhl.direnv
-            myriad-dreamin.tinymist
             ms-vscode-remote.remote-ssh
+            myriad-dreamin.tinymist
+            myriad-dreamin.tinymist # typst
             redhat.vscode-xml
             redhat.vscode-yaml
             streetsidesoftware.code-spell-checker
             streetsidesoftware.code-spell-checker-german
-            # usernamehw.errorlens
             vadimcn.vscode-lldb
             yzhang.markdown-all-in-one
             # pokey.talon
