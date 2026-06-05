@@ -249,19 +249,19 @@ in
         proxyWebsockets = true;
       };
     };
-    "widdycustomsend.${config.link.domain}"={
-      useACMEHost = config.link.domain;
-      forceSSL = true;
-      extraConfig = commonExtraConfig;
-      locations."/" = {
-        extraConfig = ''
-          auth_basic "hi there sweetheart";
-          auth_basic_user_file /var/abc.txt;
-        '';
-        proxyPass = "http://sn:61341";
-        proxyWebsockets = true;
-      };
-    };
+    # "widdycustomsend.${config.link.domain}"={
+    #   useACMEHost = config.link.domain;
+    #   forceSSL = true;
+    #   extraConfig = commonExtraConfig;
+    #   locations."/" = {
+    #     extraConfig = ''
+    #       auth_basic "hi there sweetheart";
+    #       auth_basic_user_file /var/abc.txt;
+    #     '';
+    #     proxyPass = "http://sn:61341";
+    #     proxyWebsockets = true;
+    #   };
+    # };
     # "keycloak.${config.link.domain}" = {
     #   # enableACME = true;
     #   useACMEHost = config.link.domain;
