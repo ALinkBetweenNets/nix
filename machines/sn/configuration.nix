@@ -71,7 +71,7 @@
       jellyfin.enable = true;
       # mealie.enable = true;
       # jellyseer.enable = true;
-      # minio.enable = true;
+      minio.enable = true;
       immich.enable = true;
       audiobookshelf.enable = true;
       # openvscode-server.enable = true;
