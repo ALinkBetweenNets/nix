@@ -139,7 +139,10 @@
   home-manager.users.l = flake-self.homeConfigurations.laptop;
   boot = {
     initrd.systemd.enable = true;
-    # kernelParams = [ "quiet" ];
+    # kernelParams = [
+    #   "btusb.enable_autosuspend=0"
+    #   "usbcore.autosuspend=-1"
+    # ];
     binfmt.emulatedSystems = [ "aarch64-linux" ];
     # kernel.sysctl."kernel.sysrq" = 1;
     # Alt+FN+S+key (on other devices Alt+Print+key)
@@ -155,6 +158,7 @@
   #powerManagement.scsiLinkPolicy = "med_power_with_dipm";
   # systemd.extraConfig = "DefaultLimitNOFILE=2048";
   # security.protectKernelImage = false;
+  # hardware.firmware = [ pkgs.linux-firmware ];
   environment.systemPackages = with pkgs; [
     kdePackages.frameworkintegration
     framework-tool-tui
@@ -184,4 +188,22 @@
   #     "00A7-0F41-0000-0000-0000-0000"; # Replace with your processor's serial number
   # };
   system.stateVersion = "23.11";
+
+  # boot.kernelPatches = [
+    # {
+    #   name = "enable-mt7925e";
+    #   patch=null;
+    #   structuredExtraConfig=with lib.kernel;{
+    #     MT7925E=module;
+    #   };
+    # }
+    # {
+    #   name = "mediatek-wifi-fix";
+    #   patch = pkgs.fetchpatch {
+    #     name = "mediatek-wifi-fix";
+    #     url = "https://lore.kernel.org/linux-mediatek/20251009020158.1923429-1-mingyen.hsieh@mediatek.com/raw";
+    #     hash = "sha256-BhtGp4YliIIhrqkS09RQfZytKhQwDR3DXM8d7SCJw54=";
+    #   };
+    # }
+  # ];
 }
