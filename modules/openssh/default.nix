@@ -42,8 +42,8 @@ in
       settings = {
         LogLevel = "VERBOSE"; # for fail2ban to work properly
         PermitRootLogin = "prohibit-password";
-        PasswordAuthentication = true;
-        KbdInteractiveAuthentication = true;
+        PasswordAuthentication = (!config.link.sops);
+        KbdInteractiveAuthentication = (!config.link.sops);
         X11Forwarding = true;
         UseDns = true;
         GatewayPorts = "yes";
