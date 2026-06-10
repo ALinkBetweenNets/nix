@@ -61,8 +61,8 @@ in {
               forward-addr =["172.18.0.1" "2620:fe::fe@853#dns.quad9.net"];
           }{ name = "omboard.info.";
               forward-addr =["172.18.0.1" "2620:fe::fe@853#dns.quad9.net"];
-          }{ name = "bahn.de.";
-             forward-addr =[ "172.18.0.1" "2620:fe::fe@853#dns.quad9.net"];
+          # }{ name = "bahn.de.";
+             # forward-addr =[ "172.18.0.1" "2620:fe::fe@853#dns.quad9.net"];
           }
           {
             name = "monitor-banfish.ts.net.";
