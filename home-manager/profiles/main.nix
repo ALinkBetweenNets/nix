@@ -261,6 +261,7 @@ with lib; {
       imagemagick
       luajitPackages.magick
       immich-go
+      link.terminalphone
     ];
   };
 }
