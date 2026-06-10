@@ -172,7 +172,7 @@ in
           copycompressed = "rsync -ravzHh --progress --info=progress2";
           fancytext = "figlet -tkf slant ";
           open = "xdg-open";
-          proxystart = "sudo virsh start fk ; sleep 15&& ssh -D 9051 192.168.122.7";
+          proxystart = "sudo virsh start fk ; sleep 20&& ssh -D 9051 192.168.122.7";
           o = "xdg-open";
           q = "exit";
           r = "trash put";
