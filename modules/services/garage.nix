@@ -30,7 +30,7 @@ in {
       garage = {
         enable = true;
         package = pkgs.garage_2;
-        settings.data_dir = "${config.link.storage}/garage/data";
+        # settings.data_dir = "${config.link.storage}/garage/data";
       };
       nginx.virtualHosts."garage.${config.link.domain}" = mkIf cfg.nginx {
         enableACME = true;
