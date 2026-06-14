@@ -42,7 +42,7 @@ in {
         settings = {
           data_dir = "${config.link.storage}/garage/data";
           rpc_bind_addr = "0.0.0.0:${toString cfg.port}";
-          rpc_secret_file = config.sops.secrets."garage./rpc-secret".path;
+          rpc_secret_file = config.sops.secrets."garage/rpc-secret".path;
           s3_api.api_bind_addr = "0.0.0.0:${toString ( cfg.port+1)}";
           s3_api.s3_region = "de";
           s3_api.root_domain = "s3.alinkbetweennets.de";
