@@ -20,17 +20,40 @@ in {
       default = config.link.nginx-expose;
       description = "expose the application to the internet";
     };
+    port = mkOption {
+      type = types.int;
+      default = 7825;
+      description = "port to run the application on";
+    };
   };
   config = mkIf cfg.enable {
-    # sops.secrets."garage" = {
-    #   owner = "garage";
-    #   group = "garage";
-    # };
+    sops.secrets."garage/rpc-secret" = {
+      owner = "garage";
+      group = "garage";
+    };
+    sops.secrets."garage/admin-token" = {
+      owner = "garage";
+      group = "garage";
+    };
     services = {
       garage = {
         enable = true;
         package = pkgs.garage_2;
-        # settings.data_dir = "${config.link.storage}/garage/data";
+        settings = {
+          data_dir = "${config.link.storage}/garage/data";
+          rpc_bind_addr = "0.0.0.0:${toString cfg.port}";
+          rpc_secret_file = config.sops.secrets."garage./rpc-secret".path;
+          s3_api.api_bind_addr = "0.0.0.0:${toString ( cfg.port+1)}";
+          s3_api.s3_region = "de";
+          s3_api.root_domain = "s3.alinkbetweennets.de";
+          s3_web={
+            bind_addr="0.0.0.0:${toString cfg.port+2}";
+            root_domain="s3w.alinkbetweennets.de";
+          };
+          admin.admin_token_file = config.sops.secrets."garage/admin-token".path;
+          replication_factor=1;
+          compression_level=10;
+        };
       };
       nginx.virtualHosts."garage.${config.link.domain}" = mkIf cfg.nginx {
         enableACME = true;
@@ -66,6 +89,6 @@ in {
       # nameservers = [ "100.100.100.100" "1.1.1.1" ];
     };
     networking.firewall.interfaces."${config.link.service-interface}".allowedTCPPorts =
-      mkIf cfg.expose-port [ 9001 9002 ];
+      mkIf cfg.expose-port [ cfg.port (cfg.port+1) (cfg.port+2) ];
   };
 }
