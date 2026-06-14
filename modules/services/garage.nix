@@ -47,7 +47,7 @@ in {
           s3_api.s3_region = "de";
           s3_api.root_domain = "s3.alinkbetweennets.de";
           s3_web={
-            bind_addr="0.0.0.0:${toString cfg.port+2}";
+            bind_addr="0.0.0.0:${toString (cfg.port+2)}";
             root_domain="s3w.alinkbetweennets.de";
           };
           admin.admin_token_file = config.sops.secrets."garage/admin-token".path;
