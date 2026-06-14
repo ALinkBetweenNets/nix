@@ -451,6 +451,23 @@ in
       '';
       root = "/var/www/timer/";
     };
+    "lap.${config.link.domain}" = {
+      quic = true;
+      http3_hq = true;
+      http3 = true;
+      # enableACME = true;
+      serverAliases = [
+      ];
+      useACMEHost = config.link.domain;
+      forceSSL = true;
+      extraConfig = commonExtraConfig + ''
+        add_header Cross-Origin-Opener-Policy same-origin;
+        add_header Cross-Origin-Embedder-Policy require-corp;
+        add_header X-Frame-Options sameorigin;
+        add_header X-Content-Type-Options nosniff always;
+      '';
+      root = "/var/www/lap/";
+    };
     "sca-lab.${config.link.domain}" = {
       quic = true;
       http3_hq = true;
