@@ -30,10 +30,23 @@ in {
     sops.secrets."garage/rpc-secret" = {
       owner = "root";
       group = "root";
+      sops.secrets.example-secret.mode = "0744";
     };
     sops.secrets."garage/admin-token" = {
       owner = "root";
       group = "root";
+      # Permission modes are in octal representation (same as chmod),
+      # the digits represent: user|group|others
+      # 7 - full (rwx)
+      # 6 - read and write (rw-)
+      # 5 - read and execute (r-x)
+      # 4 - read only (r--)
+      # 3 - write and execute (-wx)
+      # 2 - write only (-w-)
+      # 1 - execute only (--x)
+      # 0 - none (---)
+      sops.secrets.example-secret.mode = "0744";
+
     };
     services = {
       garage = {
