@@ -30,7 +30,7 @@ in {
     sops.secrets."garage/rpc-secret" = {
       owner = "root";
       group = "root";
-      sops.secrets.example-secret.mode = "0744";
+      mode = "0744";
     };
     sops.secrets."garage/admin-token" = {
       owner = "root";
@@ -45,7 +45,7 @@ in {
       # 2 - write only (-w-)
       # 1 - execute only (--x)
       # 0 - none (---)
-      sops.secrets.example-secret.mode = "0744";
+      mode = "0744";
 
     };
     services = {
