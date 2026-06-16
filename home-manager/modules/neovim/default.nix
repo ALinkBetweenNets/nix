@@ -250,12 +250,12 @@ with lib; {
           };
           fastaction.enable = true;
         };
-        maps.normal = {
-          "<leader>e" = {
-            desc = "Toogle Neotree";
-            action = "<cmd>Neotree toggle reveal<cr>";
-          };
-        };
+        keymaps = [{
+          key="<leader>e";
+          mode = "n";
+          desc = "Toogle Neotree";
+          action = "<cmd>Neotree toggle reveal<cr>";
+        }];
         assistant = {
           chatgpt.enable = false;
           copilot = {
