@@ -28,12 +28,12 @@ in {
   };
   config = mkIf cfg.enable {
     sops.secrets."garage/rpc-secret" = {
-      owner = "garage";
-      group = "garage";
+      owner = "root";
+      group = "root";
     };
     sops.secrets."garage/admin-token" = {
-      owner = "garage";
-      group = "garage";
+      owner = "root";
+      group = "root";
     };
     services = {
       garage = {
