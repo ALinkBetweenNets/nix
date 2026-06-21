@@ -451,7 +451,40 @@ in
       '';
       root = "/var/www/timer/";
     };
-    "lap.${config.link.domain}" = {
+    "slap.${config.link.domain}" = {
+      quic = true;
+      http3_hq = true;
+      http3 = true;
+      # enableACME = true;
+      serverAliases = [
+      ];
+      useACMEHost = config.link.domain;
+      forceSSL = true;
+      extraConfig = commonExtraConfig + ''
+        add_header Cross-Origin-Opener-Policy same-origin;
+        add_header Cross-Origin-Embedder-Policy require-corp;
+        add_header X-Frame-Options sameorigin;
+        add_header X-Content-Type-Options nosniff always;
+      '';
+      root = "/var/www/sca-lab-browser/slap/";
+    };"lap.${config.link.domain}" = {
+      quic = true;
+      http3_hq = true;
+      http3 = true;
+      # enableACME = true;
+      serverAliases = [
+      ];
+      useACMEHost = config.link.domain;
+      forceSSL = true;
+      extraConfig = commonExtraConfig + ''
+        add_header Cross-Origin-Opener-Policy same-origin;
+        add_header Cross-Origin-Embedder-Policy require-corp;
+        add_header X-Frame-Options sameorigin;
+        add_header X-Content-Type-Options nosniff always;
+      '';
+      root = "/var/www/sca-lab-browser/lap/lapweb/";
+    };
+    "lap-bkp.${config.link.domain}" = {
       quic = true;
       http3_hq = true;
       http3 = true;
@@ -467,6 +500,17 @@ in
         add_header X-Content-Type-Options nosniff always;
       '';
       root = "/var/www/lap/";
+    };
+    "collect.${config.link.domain}" = {
+      # enableACME = true;
+      useACMEHost = config.link.domain;
+      forceSSL = true;
+      extraConfig = commonExtraConfig;
+      locations."/" = {
+        extraConfig = commonLocationExtraConfig;
+        proxyPass = "http://${config.link.serviceHost}:9000";
+        proxyWebsockets = true;
+      };
     };
     "sca-lab.${config.link.domain}" = {
       quic = true;
