@@ -36,6 +36,10 @@ in
     environment.systemPackages =
       with pkgs;
       [
+        kdePackages.kimageformats
+        kdePackages.qtimageformats
+        kdePackages.phonon
+        kdePackages.phonon-vlc
         ff2mpv
         ripgrep-all
         unzip
