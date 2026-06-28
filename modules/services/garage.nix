@@ -1,7 +1,15 @@
-{ config, system-config, pkgs, lib, ... }:
+{
+  config,
+  system-config,
+  pkgs,
+  lib,
+  ...
+}:
 with lib;
-let cfg = config.link.services.garage;
-in {
+let
+  cfg = config.link.services.garage;
+in
+{
   options.link.services.garage = {
     enable = mkEnableOption "activate garage";
     expose-port = mkOption {
@@ -12,8 +20,7 @@ in {
     nginx = mkOption {
       type = types.bool;
       default = config.link.nginx.enable;
-      description =
-        "expose the application to the internet with NGINX and ACME";
+      description = "expose the application to the internet with NGINX and ACME";
     };
     nginx-expose = mkOption {
       type = types.bool;
@@ -28,13 +35,13 @@ in {
   };
   config = mkIf cfg.enable {
     sops.secrets."garage/rpc-secret" = {
-      owner = "root";
-      group = "root";
-      mode = "0744";
+      owner = "garage";
+      group = "garage";
+      # mode = "0744";
     };
     sops.secrets."garage/admin-token" = {
-      owner = "root";
-      group = "root";
+      owner = "garage";
+      group = "garage";
       # Permission modes are in octal representation (same as chmod),
       # the digits represent: user|group|others
       # 7 - full (rwx)
@@ -45,27 +52,46 @@ in {
       # 2 - write only (-w-)
       # 1 - execute only (--x)
       # 0 - none (---)
-      mode = "0744";
+      # mode = "0744";
 
+    };
+
+    users.users.garage = {
+      isSystemUser = true;
+      group = "garage";
+      # home = "/var/lib/garage";
+    };
+    users.groups.garage = { };
+    systemd.tmpfiles.rules = [
+      "d /var/lib/garage 0750 garage garage -"
+      "d /var/lib/garage/data 0750 garage garage -"
+    ];
+    systemd.services.garage = {
+      serviceConfig = {
+        User = "garage";
+        Group = "garage";
+      };
     };
     services = {
       garage = {
         enable = true;
         package = pkgs.garage_2;
         settings = {
-          data_dir = "${config.link.storage}/garage/data";
+          # data_dir = "${config.link.storage}/garage/data";
           rpc_bind_addr = "0.0.0.0:${toString cfg.port}";
           rpc_secret_file = config.sops.secrets."garage/rpc-secret".path;
-          s3_api.api_bind_addr = "0.0.0.0:${toString ( cfg.port+1)}";
-          s3_api.s3_region = "de";
-          s3_api.root_domain = "s3.alinkbetweennets.de";
-          s3_web={
-            bind_addr="0.0.0.0:${toString (cfg.port+2)}";
-            root_domain="s3w.alinkbetweennets.de";
+          s3_api = {
+            api_bind_addr = "0.0.0.0:${toString (cfg.port + 1)}";
+            s3_region = "de";
+            root_domain = "s3.alinkbetweennets.de";
+          };
+          s3_web = {
+            bind_addr = "0.0.0.0:${toString (cfg.port + 2)}";
+            root_domain = "s3w.alinkbetweennets.de";
           };
           admin.admin_token_file = config.sops.secrets."garage/admin-token".path;
-          replication_factor=1;
-          compression_level=10;
+          replication_factor = 1;
+          compression_level = 10;
         };
       };
       nginx.virtualHosts."garage.${config.link.domain}" = mkIf cfg.nginx {
@@ -102,6 +128,11 @@ in {
       # nameservers = [ "100.100.100.100" "1.1.1.1" ];
     };
     networking.firewall.interfaces."${config.link.service-interface}".allowedTCPPorts =
-      mkIf cfg.expose-port [ cfg.port (cfg.port+1) (cfg.port+2) ];
+      mkIf cfg.expose-port
+        [
+          cfg.port
+          (cfg.port + 1)
+          (cfg.port + 2)
+        ];
   };
 }
