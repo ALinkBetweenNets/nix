@@ -94,6 +94,7 @@ with lib; {
       zotero
       openai-whisper # transcription
       ripgrep-all # also search pdfs, ebooks, office docs, zip, tar.gz
+      # deskreen
       kdePackages.plasma-browser-integration
       teams-for-linux
       virt-viewer # spice client for remote-viewer
