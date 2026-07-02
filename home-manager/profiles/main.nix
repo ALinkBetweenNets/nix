@@ -86,6 +86,7 @@ with lib; {
     fonts.fontconfig.enable = true;
 
     home.packages = with pkgs; [
+      tinymist
       # bitwarden-cli
       claude-code
       nextcloud-client

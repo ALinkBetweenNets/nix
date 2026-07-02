@@ -1,5 +1,12 @@
-{ lib, pkgs, inputs, config, ... }:
-with lib; {
+{
+  lib,
+  pkgs,
+  inputs,
+  config,
+  ...
+}:
+with lib;
+{
   # programs.neovim = {
   #   enable = true;
   #   coc.enable = true;
@@ -10,20 +17,61 @@ with lib; {
       enable = true;
       settings = {
         theme = "base16_transparent";
-        editor.lsp.display-messages = true;
-        editor.soft-wrap.enable = true;
-        editor.cursor-shape = {
-          insert = "bar";
-          normal = "block";
-          select = "underline";
+        editor = {
+          line-number = "relative";
+          cursorline = true;
+          color-modes = true;
+          lsp = {
+            display-inlay-hints = true;
+            display-messages = true;
+          };
+          soft-wrap.enable = true;
+          cursor-shape = {
+            insert = "bar";
+            normal = "block";
+            select = "underline";
+          };
         };
       };
       languages = {
-        language = [{
-          name = "nix";
-          auto-format = true;
-          formatter.command = "${pkgs.nixfmt}/bin/nixfmt";
-        }];
+        language-server.tinymist = {
+          command = "tinymist";
+          environment.RUST_LOG = "tinymist=debug,typst_preview=debug";
+          config = {
+            formatterMode = "typstyle";
+            exportPdf = "onSave";
+            semanticTokens = "enable";
+            preview.background.enable = true;
+            # preview.background.args = [
+            # "--data-plane-host=127.0.0.1:0"
+            # "--invert-colors=never"
+            # "--open"
+            # ];
+          };
+        };
+        language = [
+          {
+            name = "nix";
+            auto-format = true;
+            formatter.command = "${pkgs.nixfmt}/bin/nixfmt";
+          }
+          {
+            name = "typst";
+            scope = "source.typst";
+            injection-regex = "typst";
+            file-types = [ "typ" ];
+            comment-token = "//";
+            language-servers = [ "tinymist" ];
+            auto-format = true; # <- format on save (delegated to tinymist/typstyle)
+            indent = {
+              tab-width = 2;
+              unit = "  ";
+            };
+            text-width = 100;
+            rulers = [ 100 ];
+            soft-wrap.wrap-at-text-width = true;
+          }
+        ];
       };
     };
     programs.nvf = {
@@ -59,8 +107,7 @@ with lib; {
             mappings.confirm = "<C-Tab>";
           };
         };
-        autopairs.nvim-autopairs.enable =
-          false; # Creates closing brackets when you enter opening bracket
+        autopairs.nvim-autopairs.enable = false; # Creates closing brackets when you enter opening bracket
         debugger.nvim-dap = {
           enable = true;
           ui.enable = true;
@@ -144,7 +191,9 @@ with lib; {
             };
           };
         };
-        tabline = { nvimBufferline.enable = true; };
+        tabline = {
+          nvimBufferline.enable = true;
+        };
         treesitter = {
           enable = true;
           highlight.enable = true;
@@ -164,16 +213,19 @@ with lib; {
         };
         minimap = {
           # minimap-vim.enable = true;
-          codewindow.enable =
-            false; # lighter, faster, and uses lua for configuration
+          codewindow.enable = false; # lighter, faster, and uses lua for configuration
         };
         dashboard = {
           # dashboard-nvim.enable = true;
           alpha.enable = true;
         };
         searchCase = "ignore";
-        notify = { nvim-notify.enable = true; };
-        projects = { project-nvim.enable = true; };
+        notify = {
+          nvim-notify.enable = true;
+        };
+        projects = {
+          project-nvim.enable = true;
+        };
         utility = {
           yazi-nvim.enable = true;
           ccc.enable = true;
@@ -245,17 +297,22 @@ with lib; {
               nix = "110";
               ruby = "120";
               java = "130";
-              go = [ "90" "130" ];
+              go = [
+                "90"
+                "130"
+              ];
             };
           };
           fastaction.enable = true;
         };
-        keymaps = [{
-          key="<leader>e";
-          mode = "n";
-          desc = "Toogle Neotree";
-          action = "<cmd>Neotree toggle reveal<cr>";
-        }];
+        keymaps = [
+          {
+            key = "<leader>e";
+            mode = "n";
+            desc = "Toogle Neotree";
+            action = "<cmd>Neotree toggle reveal<cr>";
+          }
+        ];
         assistant = {
           chatgpt.enable = false;
           copilot = {
