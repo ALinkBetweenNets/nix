@@ -55,6 +55,9 @@ in
       # mode = "0744";
 
     };
+    sops.secrets."garage/default-access-key"={owner="garage";user="garage";};
+    sops.secrets."garage/default-secret-key"={owner="garage";user="garage";};
+    sops.secrets."garage/default-bucket"={group="garage";user="garage";};
 
     users.users.garage = {
       isSystemUser = true;

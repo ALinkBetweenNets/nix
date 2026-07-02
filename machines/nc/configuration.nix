@@ -733,17 +733,17 @@ in
         proxyWebsockets = true;
       };
     };
-    "minio.${config.link.domain}" = {
-      # enableACME = true;
-      useACMEHost = config.link.domain;
-      forceSSL = true;
-      extraConfig = commonExtraConfig;
-      locations."/" = {
-        extraConfig = commonLocationExtraConfig;
-        proxyPass = "http://${config.link.serviceHost}:9002";
-        proxyWebsockets = true;
-      };
-    };
+    # "s3w.${config.link.domain}" = {
+    #   # enableACME = true;
+    #   useACMEHost = config.link.domain;
+    #   forceSSL = true;
+    #   extraConfig = commonExtraConfig;
+    #   locations."/" = {
+    #     extraConfig = commonLocationExtraConfig;
+    #     proxyPass = "http://${config.link.serviceHost}:9002";
+    #     proxyWebsockets = true;
+    #   };
+    # };
     "s3.${config.link.domain}" = {
       # enableACME = true;
       useACMEHost = config.link.domain;
@@ -751,7 +751,7 @@ in
       extraConfig = commonExtraConfig;
       locations."/" = {
         extraConfig = commonLocationExtraConfig;
-        proxyPass = "http://${config.link.serviceHost}:9001";
+        proxyPass = "http://${config.link.serviceHost}:7826";
         # extraConfig = ''
         #   proxy_set_header X-Real-IP $remote_addr;
         #   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
