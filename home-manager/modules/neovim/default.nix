@@ -34,8 +34,17 @@ with lib;
         };
       };
       languages = {
+        language-server.ltex-ls-plus = {
+          ltex.diagnosticSeverity = "warning";
+          ltex.ltex-ls.logLevel = "warning";
+          # ltex.disabledRules = { "en-US" = ["PROFANITY"], "en-GB" = ["PROFANITY"] };
+          ltex.dictionary = {
+            "en-US" = [ "builtin" ];
+          };
+
+        };
         language-server.tinymist = {
-          command = "tinymist";
+          command = "${pkgs.tinymist}/bin/tinymist";
           environment.RUST_LOG = "tinymist=debug,typst_preview=debug";
           config = {
             formatterMode = "typstyle";
@@ -70,6 +79,28 @@ with lib;
             text-width = 100;
             rulers = [ 100 ];
             soft-wrap.wrap-at-text-width = true;
+          }
+          {
+            name = "markdown";
+            # scope = "source.md";
+            language-servers = [
+              "markdown-oxide"
+              "ltex-ls-plus"
+            ];
+            formatter = {
+              command = "${pkgs.prettier}/bin/prettier";
+              args = [
+                "--parser"
+                "markdown"
+                # "--prose-wrap"
+                # "neven"
+              ];
+            };
+            auto-format = true;
+            indent = {
+              tab-width = 2;
+              unit = " ";
+            };
           }
         ];
       };

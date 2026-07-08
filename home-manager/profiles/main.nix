@@ -1,5 +1,6 @@
 { lib, pkgs, ... }:
-with lib; {
+with lib;
+{
   imports = [ ./desktop.nix ];
   config = {
     # imports = with flake-self.homeModules; [ git ];
@@ -60,20 +61,16 @@ with lib; {
         maxItems = 500;
         urls = [
           {
-            url =
-              "https://wid.cert-bund.de/content/public/securityAdvisory/rss";
+            url = "https://wid.cert-bund.de/content/public/securityAdvisory/rss";
           }
           {
-            url =
-              "https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_CSW.xml";
+            url = "https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_CSW.xml";
           }
           {
-            url =
-              "https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_Presse_Veranstaltungen.xml";
+            url = "https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/RSSNewsfeed_Presse_Veranstaltungen.xml";
           }
           {
-            url =
-              "https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/ACS_RSSNewsfeed.xml"; # allianz für cybersicherheit
+            url = "https://www.bsi.bund.de/SiteGlobals/Functions/RSSFeed/RSSNewsfeed/ACS_RSSNewsfeed.xml"; # allianz für cybersicherheit
           }
           { url = "https://www.evilsocket.net/atom.xml"; }
           { url = "https://events.ccc.de/feed"; }
@@ -96,6 +93,10 @@ with lib; {
       openai-whisper # transcription
       ripgrep-all # also search pdfs, ebooks, office docs, zip, tar.gz
       # deskreen
+      ltex-ls-plus
+      markdown-oxide
+      prettier
+
       kdePackages.plasma-browser-integration
       teams-for-linux
       virt-viewer # spice client for remote-viewer
