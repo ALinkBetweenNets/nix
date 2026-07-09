@@ -33,33 +33,23 @@ with lib;
         enable = true;
         enableZshIntegration = true;
         extraConfig = ''
-          -- Pull in the wezterm API
-          local wezterm = require 'wezterm'
-
-          -- This will hold the configuration.
           local config = wezterm.config_builder()
-
-          -- This is where you actually apply your config choices.
-
-          -- For example, changing the initial geometry for new windows:
           -- config.initial_cols = 120
           -- config.initial_rows = 28
-
           -- or, changing the font size and color scheme.
           -- config.font_size = 10
           -- config.color_scheme = 'AdventureTime'
 
-          -- Finally, return the configuration to wezterm:
           config.font = wezterm.font("FiraCode Nerd Font")
           -- config.active_titlebar_bg = '#a11717'
           -- config.inactive_titlebar_bg = '#1d9623'
           --config.tab_bar.inactive_tab_edge = '#2a3ba6'
           --config.hide_tab_bar_if_only_one_tab = true
           config.font_size = 12.0
-          hide_tab_bar_if_only_one_tab = true
-          enable_kitty_keyboard = true
-          enable_wayland = true
-          max_fps=120
+          config.hide_tab_bar_if_only_one_tab = true
+          config.enable_kitty_keyboard = true
+          config.enable_wayland = true
+          config.max_fps=120
           return config
         '';
         #     window_background_opacity=0.7,
