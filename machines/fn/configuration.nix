@@ -1,11 +1,11 @@
 { self, ... }:
 {
-  pkgs,
-  lib,
-  config,
-  flake-self,
-  home-manager,
-  ...
+pkgs,
+lib,
+config,
+flake-self,
+home-manager,
+...
 }:
 {
   imports = [
@@ -16,6 +16,7 @@
   ];
   system.autoUpgrade.enable = lib.mkForce false;
   link = {
+    hardware.enable=true;
     wg-link.enable = true;
     wg-link.address = "10.5.5.2/24";
     # plymouth.enable = true;
@@ -158,7 +159,7 @@
   #powerManagement.scsiLinkPolicy = "med_power_with_dipm";
   # systemd.extraConfig = "DefaultLimitNOFILE=2048";
   # security.protectKernelImage = false;
-  # hardware.firmware = [ pkgs.linux-firmware ];
+  hardware.firmware = [ pkgs.linux-firmware];
   environment.systemPackages = with pkgs; [
     kdePackages.frameworkintegration
     framework-tool-tui
