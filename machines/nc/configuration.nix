@@ -213,27 +213,25 @@ in
     #     }";
     #   locations."/".proxyWebsockets = true;
     # };
-    # "vikunja.${config.link.domain}" = {
-    #   # enableACME = true;
-    #   useACMEHost = config.link.domain;
-    #   forceSSL=true;
-    # extraConfig = commonExtraConfig;
-    #   locations."/" ={extraConfig = commonLocationExtraConfig;
-    # proxyPass = "http://${config.link.serviceHost}:${
-    #       toString config.link.services.vikunja.port
-    #     }";
-    #   locations."/".proxyWebsockets = true;
-    # };
+    "vikunja.${config.link.domain}" = {
+      # enableACME = true;
+      useACMEHost = config.link.domain;
+      forceSSL = true;
+      extraConfig = commonExtraConfig;
+      locations."/" = {
+        extraConfig = commonLocationExtraConfig;
+        proxyPass = "http://${config.link.serviceHost}:${toString config.link.services.vikunja.port}";
+        proxyWebsockets = true;
+      };
+    };
     # "gitea.${config.link.domain}" = {
     #   # enableACME = true;
     #   useACMEHost = config.link.domain;
-    #   forceSSL=true;
-    # extraConfig = commonExtraConfig;
+    #   forceSSL = true;
+    #   extraConfig = commonExtraConfig;
     #   locations."/" = {
     #     extraConfig = commonLocationExtraConfig;
-    # proxyPass = "http://${config.link.serviceHost}:${
-    #         toString config.services.gitea.settings.server.HTTP_PORT
-    #       }";
+    #     proxyPass = "http://${config.link.serviceHost}:${toString config.services.gitea.settings.server.HTTP_PORT}";
     #     proxyWebsockets = true;
     #   };
     # };
@@ -467,7 +465,8 @@ in
         add_header X-Content-Type-Options nosniff always;
       '';
       root = "/var/www/sca-lab-browser/slap/";
-    };"lap.${config.link.domain}" = {
+    };
+    "lap.${config.link.domain}" = {
       quic = true;
       http3_hq = true;
       http3 = true;
