@@ -196,7 +196,6 @@ in
           t = "tailscale";
           opn = "sudo openvpn";
           ts = "tailscale status";
-          f = "fuck";
           p = "python";
           b = "bat";
           s = "sudo";
