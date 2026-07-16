@@ -159,7 +159,7 @@ in {
         ];
         initialize = true;
       };
-      sn = mkIf (cfg.backup-paths-sn != [ ]) {
+      sn = {
         paths = cfg.backup-paths-sn;
         repositoryFile = config.sops.secrets."restic/sn/repository".path;
         passwordFile = config.sops.secrets."restic/sn/password".path;
