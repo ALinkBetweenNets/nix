@@ -1,0 +1,19 @@
+[package]
+name = "oblivian-server"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.103"
+argon2 = "0.5.3"
+axum = { version = "0.8.9", features = ["ws"] }
+rand_core = { version = "0.6", features = ["getrandom"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.150"
+sha2 = "0.11.0"
+tokio = { version = "1.52.3", features = ["full"] }
+yrs = { version = "0.27.3", features = ["sync"] }
+
+[dev-dependencies]
+futures-util = "0.3.32"
+tokio-tungstenite = "0.30.0"

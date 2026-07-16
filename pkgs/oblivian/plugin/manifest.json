@@ -1,0 +1,9 @@
+{
+	"id": "oblivian",
+	"name": "Oblivian",
+	"version": "0.1.0",
+	"minAppVersion": "1.5.0",
+	"description": "Live collaboration on your vault's markdown files through a self-hosted sync server.",
+	"author": "Björn Carlberg",
+	"isDesktopOnly": false
+}

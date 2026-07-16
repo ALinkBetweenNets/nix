@@ -50,6 +50,7 @@
     service-ports-expose = true;
     services = {
       radicale.enable = true;
+      oblivian.enable = true;
       netbox.enable = true;
       # part-db.enable = true;
       # tt-rss.enable = true;
