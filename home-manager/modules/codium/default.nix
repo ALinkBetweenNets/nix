@@ -186,7 +186,7 @@ in
           "terminal.integrated.mouseWheelZoom" = true;
           "tinymist.lint.enabled" = true;
           "tinymist.preview.cursorIndicator" = true;
-          "tinymist.preview.invertColors" = "never";
+          "tinymist.preview.invertColors" = "always";
           "vscode-pets.petColor" = "white";
           "vscode-pets.throwBallWithMouse" = true;
           "workbench.editor.highlightModifiedTabs" = true;
