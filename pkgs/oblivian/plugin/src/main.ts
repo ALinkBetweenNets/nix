@@ -1,4 +1,5 @@
 import { Notice, Plugin, TFile } from "obsidian";
+import { Compartment } from "@codemirror/state";
 import { Engine } from "./engine";
 import { EditorBinder } from "./editor-binding";
 import {
@@ -12,10 +13,14 @@ export default class OblivianPlugin extends Plugin {
 	private engine: Engine | null = null;
 	private binder: EditorBinder | null = null;
 	private statusBar!: HTMLElement;
+	// One compartment for all editors, registered once: Obsidian keeps it in
+	// every editor config rebuild, unlike appendConfig-injected extensions.
+	private editorCompartment = new Compartment();
 
 	async onload() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 		this.addSettingTab(new OblivianSettingTab(this.app, this));
+		this.registerEditorExtension(this.editorCompartment.of([]));
 		this.statusBar = this.addStatusBarItem();
 		this.setStatus("off");
 		this.app.workspace.onLayoutReady(() => void this.startSync());
@@ -42,13 +47,14 @@ export default class OblivianPlugin extends Plugin {
 	private async startSync() {
 		if (!this.configured() || this.engine) return;
 		const engine = new Engine(this.app, this.settings);
-		const binder = new EditorBinder(this.app, engine, {
+		const binder = new EditorBinder(this.app, engine, this.editorCompartment, {
 			name: this.settings.userName || "anonymous",
 			color: this.settings.userColor,
 			colorLight: this.settings.userColor + "33",
 		});
 		this.engine = engine;
 		this.binder = binder;
+		engine.isBound = (path) => binder.isBound(path);
 
 		engine.provider.onStatus = (s) => {
 			this.setStatus(s);
@@ -98,6 +104,14 @@ export default class OblivianPlugin extends Plugin {
 		);
 		this.registerEvent(
 			this.app.workspace.on("layout-change", () => active() && binder.refresh()),
+		);
+		this.registerEvent(
+			this.app.workspace.on("file-open", () => active() && binder.refresh()),
+		);
+		// Self-heal: an editor config rebuild silently drops the binding and
+		// fires no event we can hook, so re-check attachment periodically.
+		this.registerInterval(
+			window.setInterval(() => active() && binder.refresh(), 2000),
 		);
 		binder.refresh();
 	}

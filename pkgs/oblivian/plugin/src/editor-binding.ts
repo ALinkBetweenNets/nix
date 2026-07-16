@@ -1,64 +1,89 @@
 import { App, MarkdownView } from "obsidian";
-import { Compartment, StateEffect } from "@codemirror/state";
+import { Compartment, Extension } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import { yCollab } from "y-codemirror.next";
 import { Engine } from "./engine";
 
-interface Binding {
-	path: string | null;
-	compartment: Compartment;
+interface Attached {
+	path: string;
+	ext: Extension;
 }
 
 /**
  * Attaches yCollab (live sync + remote cursors) to every markdown editor
- * showing a synced file. Obsidian has no per-file extension hook, so we
- * inject a Compartment into each editor once and reconfigure it as the
- * displayed file changes.
+ * showing a synced file.
+ *
+ * The compartment is registered globally via registerEditorExtension (done in
+ * main.ts), NOT injected with StateEffect.appendConfig: Obsidian rebuilds
+ * editor configs from the registered extension list on workspace
+ * .updateOptions() (any plugin load / settings change), which silently drops
+ * appended configs. A rebuild resets the compartment to [], so refresh() also
+ * runs on an interval and re-attaches whenever the binding went missing.
  */
 export class EditorBinder {
-	private bindings = new Map<EditorView, Binding>();
+	private attached = new Map<EditorView, Attached>();
 
 	constructor(
 		private app: App,
 		private engine: Engine,
+		private compartment: Compartment,
 		private user: { name: string; color: string; colorLight: string },
 	) {}
 
 	refresh() {
-		for (const [cm] of this.bindings) {
-			if (!cm.dom.isConnected) this.bindings.delete(cm);
+		for (const [cm] of this.attached) {
+			if (!cm.dom.isConnected) this.attached.delete(cm);
 		}
 		for (const leaf of this.app.workspace.getLeavesOfType("markdown")) {
 			const view = leaf.view as MarkdownView;
 			const cm = (view.editor as unknown as { cm?: EditorView }).cm;
 			if (!cm) continue;
 			const path = view.file?.path ?? null;
-			const binding = this.bindings.get(cm);
-			if (binding?.path === path) continue;
-			if (binding?.path) this.detach(cm, binding);
-			if (path && this.engine.isReady(path) && this.engine.isAlive(path)) {
+			const record = this.attached.get(cm);
+			// The binding is live only if the compartment still holds our
+			// extension; a config rebuild resets it without any event.
+			const live =
+				record !== undefined && this.compartment.get(cm.state) === record.ext;
+			const wanted =
+				path !== null &&
+				this.engine.isReady(path) &&
+				this.engine.isAlive(path);
+			if (wanted && live && record!.path === path) continue;
+			if (!wanted && !live) {
+				this.attached.delete(cm);
+				continue;
+			}
+			if (live && record!.path !== path) this.clearCursor(record!.path);
+			if (wanted && path) {
 				this.attach(cm, path);
+			} else {
+				cm.dispatch({ effects: this.compartment.reconfigure([]) });
+				this.attached.delete(cm);
 			}
 		}
 	}
 
-	unbindAll() {
-		for (const [cm, binding] of this.bindings) {
-			if (binding.path && cm.dom.isConnected) this.detach(cm, binding);
+	isBound(path: string): boolean {
+		for (const [cm, record] of this.attached) {
+			if (
+				record.path === path &&
+				cm.dom.isConnected &&
+				this.compartment.get(cm.state) === record.ext
+			) {
+				return true;
+			}
 		}
-		this.bindings.clear();
+		return false;
 	}
 
-	private getBinding(cm: EditorView): Binding {
-		let binding = this.bindings.get(cm);
-		if (!binding) {
-			binding = { path: null, compartment: new Compartment() };
-			cm.dispatch({
-				effects: StateEffect.appendConfig.of(binding.compartment.of([])),
-			});
-			this.bindings.set(cm, binding);
+	unbindAll() {
+		for (const [cm, record] of this.attached) {
+			this.clearCursor(record.path);
+			if (cm.dom.isConnected) {
+				cm.dispatch({ effects: this.compartment.reconfigure([]) });
+			}
 		}
-		return binding;
+		this.attached.clear();
 	}
 
 	private attach(cm: EditorView, path: string) {
@@ -74,20 +99,12 @@ export class EditorBinder {
 				changes: { from: 0, to: cm.state.doc.length, insert: content },
 			});
 		}
-		const binding = this.getBinding(cm);
-		binding.path = path;
-		cm.dispatch({
-			effects: binding.compartment.reconfigure(yCollab(ytext, slot.awareness)),
-		});
+		const ext = yCollab(ytext, slot.awareness);
+		cm.dispatch({ effects: this.compartment.reconfigure(ext) });
+		this.attached.set(cm, { path, ext });
 	}
 
-	private detach(cm: EditorView, binding: Binding) {
-		if (binding.path) {
-			this.engine
-				.getSlot(binding.path)
-				?.awareness.setLocalStateField("cursor", null);
-		}
-		binding.path = null;
-		cm.dispatch({ effects: binding.compartment.reconfigure([]) });
+	private clearCursor(path: string) {
+		this.engine.getSlot(path)?.awareness.setLocalStateField("cursor", null);
 	}
 }

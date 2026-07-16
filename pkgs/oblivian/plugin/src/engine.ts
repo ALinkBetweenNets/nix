@@ -27,6 +27,8 @@ export class Engine {
 	readonly provider: MuxProvider;
 	/** Fires after a doc becomes safe to bind to an editor. */
 	onReady: (path: string) => void = () => {};
+	/** Set by main.ts: whether a live editor binding exists for this path. */
+	isBound: (path: string) => boolean = () => false;
 
 	private docs = new Map<string, Managed>();
 	private index!: Y.Map<IndexEntry>;
@@ -130,6 +132,18 @@ export class Engine {
 
 	async onLocalModify(file: TFile) {
 		if (!this.docs.has(file.path) || this.pendingSeed.has(file.path)) return;
+		// A bound editor already feeds the Y.Doc, and its autosaved file may
+		// lag remote content that was never written to disk (open files are
+		// mirrored by the editor, not writeToDisk). Reconciling from such a
+		// file would diff that remote content right out of the doc — the
+		// "host overwrites collaborators" failure. Same while connected but
+		// momentarily unbound: skip, the binder re-attaches within seconds.
+		if (
+			this.isFileOpen(file.path) &&
+			(this.isBound(file.path) || this.provider.status === "connected")
+		) {
+			return;
+		}
 		await this.reconcileFromDisk(file.path);
 	}
 
