@@ -81,6 +81,7 @@
         nginx-expose = true;
       };
       vikunja.enable = true;
+      wallabag.enable = true;
       # nfs.enable = true;
       # outline = {
       #   enable = true;
