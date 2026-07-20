@@ -19,6 +19,7 @@
     domain = "dn.local"; # testing domain
     # home-assistant.enable = true;
     docker.enable = true;
+    syncthing.enable = lib.mkForce false;
     services = {
       # ollama.enable = true;
       # matrix.enable = true;

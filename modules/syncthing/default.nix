@@ -44,7 +44,7 @@ in
         # overrides any folders added or deleted through the WebUI
         overrideFolders = true;
         devices = {
-          "dn".id = "2UZCLBR-LR5DMFA-HWXNELR-3GF6BVU-RZEBCWZ-P72JF4N-ZV7H6MF-SEQX4QK";
+          # "dn".id = "2UZCLBR-LR5DMFA-HWXNELR-3GF6BVU-RZEBCWZ-P72JF4N-ZV7H6MF-SEQX4QK";
           "xn".id = "Z5CMPPX-PFIAWAO-NFTUO3B-E4MKXAS-EKD3JKU-7E6BYFG-SH34CRI-2W56QA2";
           "fn".id = "YPG6EYA-VRGS6CZ-5X6HXEM-ABGDCRY-7EIVCWL-2K4U4XQ-KA2W6H6-JYY4PAQ";
           "s22".id = "V446NPI-YZNXTZL-5LFFQFV-GW7DXHV-IMAX7VX-B27RYFO-FZFSEYG-TMSTTAR";
@@ -68,7 +68,7 @@ in
           "v" = {
             path = lib.mkDefault "${config.link.syncthingDir}/v";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "in"
@@ -97,7 +97,7 @@ in
           "uni" = {
             path = lib.mkDefault "${config.link.syncthingDir}/uni";
             devices = [
-              "dn"
+              # "dn"
               "hn"
               "fn"
               "in"
@@ -116,7 +116,7 @@ in
           "w" = {
             path = lib.mkDefault "${config.link.syncthingDir}/w";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "sn"
@@ -133,7 +133,7 @@ in
           "github" = {
             path = lib.mkDefault "${config.link.syncthingDir}/github";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "nn"
@@ -172,7 +172,7 @@ in
           "archive" = {
             path = lib.mkDefault "${config.link.syncthingDir}/archive";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "xn"
               "nn"
@@ -188,7 +188,7 @@ in
           "doc" = {
             path = lib.mkDefault "${config.link.syncthingDir}/doc";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "in"
@@ -207,7 +207,7 @@ in
           "music" = {
             path = lib.mkDefault "${config.link.syncthingDir}/Music";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "in"
@@ -226,7 +226,7 @@ in
           "crypt" = {
             path = lib.mkDefault "${config.link.syncthingDir}/crypt";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "nn"
@@ -239,7 +239,7 @@ in
           "sec" = {
             path = lib.mkDefault "${config.link.syncthingDir}/sec";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "nn"
@@ -266,7 +266,7 @@ in
           "keys" = {
             path = lib.mkDefault "${config.link.syncthingDir}/.keys";
             devices = [
-              "dn"
+              # "dn"
               "fn"
               "hn"
               "in"
