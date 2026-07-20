@@ -22,10 +22,8 @@ let
     ]));
   console =
     "WALLABAG_DATA=${dataDir} ${phpPackage}/bin/php ${wallabag}/bin/console --no-interaction --env=prod";
-  domainName = if cfg.nginx then
-    "https://wallabag.${config.link.domain}"
-  else
-    "http://${config.networking.hostName}:${toString cfg.port}";
+  domainName = 
+    "https://wallabag.${config.link.domain}";
 in {
   options.link.services.wallabag = {
     enable = mkEnableOption "activate wallabag";
@@ -174,29 +172,26 @@ in {
     services.nginx = {
       enable = true;
       virtualHosts.wallabag = {
-        serverName = if cfg.nginx then "wallabag.${config.link.domain}" else "_";
+        serverName = "wallabag.${config.link.domain}";
         root = "${wallabag}/web";
-        listen = optionals (!cfg.nginx) [{
-          addr = config.link.service-ip;
+        listen =  [{
+          addr = "0.0.0.0";
           port = cfg.port;
         }];
-        enableACME = cfg.nginx;
-        forceSSL = cfg.nginx;
         locations."/".tryFiles = "$uri /app.php$is_args$args";
-        locations."~ ^/app\\.php(/|$)".extraConfig = ''
+        locations."= /app.php".extraConfig = ''
           fastcgi_pass unix:${config.services.phpfpm.pools.wallabag.socket};
-          fastcgi_split_path_info ^(.+\.php)(/.*)$;
           include ${config.services.nginx.package}/conf/fastcgi_params;
           fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
           fastcgi_param DOCUMENT_ROOT $document_root;
           internal;
         '';
         locations."~ \\.php$".extraConfig = "return 404;";
-        extraConfig = mkIf (!cfg.nginx-expose) ''
-          allow ${config.link.service-ip}/24;
-          allow 127.0.0.1;
-          deny all;
-        '';
+        # extraConfig = ''
+        #   allow ${config.link.service-ip}/24;
+        #   allow 127.0.0.1;
+        #   deny all;
+        # '';
       };
     };
 
