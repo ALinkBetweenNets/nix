@@ -35,7 +35,7 @@
     syncthing.enable = true;
     syncthingDir = "/var/lib/syncthing";
     # secrets = "/pwd";
-    # service-ip = "10.0.1.1";
+    service-ip = "100.108.233.76";
     # users.lenny.enable = true;
     # users.lmh01.enable = true;
     service-interface = "tailscale0";
