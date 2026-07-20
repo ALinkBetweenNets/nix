@@ -7,9 +7,10 @@ losslessly when the connection returns.
 
 Two parts:
 
-- **`plugin/`** — the Obsidian plugin. One Y.Doc per markdown file, bound to
-  the editor via `y-codemirror.next`, persisted locally in IndexedDB, synced
-  over a single multiplexed websocket per vault.
+- **`plugin/`** — the Obsidian plugin. One Y.Doc per file: markdown files are
+  collaborative `Y.Text` bound to the editor via `y-codemirror.next`, every
+  other file (attachments, installed plugins) is a byte blob. Persisted locally
+  in IndexedDB, synced over a single multiplexed websocket per vault.
 - **`server/`** — a Rust (axum + yrs) server. Hosts any number of vaults;
   each vault is created by one person (the host) with a password that gates
   access. Meant to run on a tailnet node, reachable by all collaborators.
@@ -73,9 +74,22 @@ The host revokes access by rotating the password in settings.
 - The server keeps a snapshot + append-only update log per doc; if the log's
   tail is lost, clients re-send missing updates on the next sync handshake.
 
-Known limits (deliberate): only `.md` files sync (no attachments); undo may
-undo collaborators' edits (Obsidian's native undo isn't Yjs-aware); a file
-deleted while a peer edits it offline resurrects from the trash-side peer.
+## What syncs
+
+All files of any extension (notes, attachments), plus the `.obsidian` config
+dir so installed plugins, themes, snippets and settings travel with the vault.
+Excluded: hidden files/folders outside `.obsidian` (`.trash`, `.git`, …),
+per-device window layout (`workspace.json`), and — importantly — Oblivian's own
+settings (`.obsidian/plugins/oblivian/`), which hold the vault password.
+
+Markdown merges character-by-character; every other file is last-writer-wins on
+its bytes. The config dir is snapshotted at startup and applied live, but local
+config changes (e.g. installing a plugin) are only picked up on the next
+Obsidian restart, and plugin/theme files written to disk need a restart to load.
+
+Known limits (deliberate): undo may undo collaborators' edits (Obsidian's native
+undo isn't Yjs-aware); a file deleted while a peer edits it offline resurrects
+from the trash-side peer; a very large attachment travels as one Yjs update.
 
 ## Development
 

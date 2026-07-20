@@ -3,11 +3,22 @@ import * as Y from "yjs";
 import { IndexeddbPersistence } from "y-indexeddb";
 import { simpleDiffString } from "lib0/diff";
 import { DocSlot, MuxProvider } from "./provider";
+import { isConfig, isText, shouldSync } from "./paths";
 import type { OblivianSettings } from "./settings";
 
 export const INDEX_DOC = "__index__";
 const LOCAL_INDEX = "local-index"; // txn origin for our own index edits
 const DISK = "disk"; // txn origin for disk->ydoc reconciliation
+
+function equalBytes(a: Uint8Array, b: Uint8Array): boolean {
+	if (a.length !== b.length) return false;
+	for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+	return true;
+}
+
+function toArrayBuffer(a: Uint8Array): ArrayBuffer {
+	return a.buffer.slice(a.byteOffset, a.byteOffset + a.byteLength) as ArrayBuffer;
+}
 
 interface IndexEntry {
 	deleted: boolean;
@@ -19,9 +30,12 @@ interface Managed {
 }
 
 /**
- * Owns one Y.Doc per markdown file plus the vault-level index doc that
- * replicates file create/delete/rename. Bridges Y.Docs to disk for files not
- * open in an editor, and reconciles disk edits made while the plugin was off.
+ * Owns one Y.Doc per synced file plus the vault-level index doc that
+ * replicates file create/delete/rename. Markdown files are collaborative
+ * Y.Text; every other file (attachments, and config-dir files like installed
+ * plugins) is a last-writer-wins byte blob stored in a Y.Map. Bridges Y.Docs
+ * to disk for files not open in an editor, and reconciles disk edits made
+ * while the plugin was off.
  */
 export class Engine {
 	readonly provider: MuxProvider;
@@ -43,11 +57,13 @@ export class Engine {
 	/** Paths with programmatic vault operations in flight (event echo guard). */
 	private suppressed = new Set<string>();
 	private writeTimers = new Map<string, ReturnType<typeof setTimeout>>();
+	private readonly configDir: string;
 
 	constructor(
 		private app: App,
 		private settings: OblivianSettings,
 	) {
+		this.configDir = app.vault.configDir;
 		const base = settings.serverUrl.replace(/^http/, "ws").replace(/\/+$/, "");
 		this.provider = new MuxProvider(
 			`${base}/vault/${settings.vaultId}`,
@@ -60,8 +76,13 @@ export class Engine {
 		this.index = indexDoc.getMap<IndexEntry>("files");
 		await this.manage(INDEX_DOC, indexDoc);
 
-		for (const file of this.app.vault.getMarkdownFiles()) {
-			await this.openFileDoc(file.path);
+		for (const file of this.app.vault.getFiles()) {
+			if (shouldSync(file.path, this.configDir)) await this.openFileDoc(file.path);
+		}
+		// Config-dir files (installed plugins, themes, settings) aren't vault
+		// files and get no vault events, so snapshot them once at startup.
+		for (const path of await this.listConfigFiles()) {
+			await this.openFileDoc(path);
 		}
 		// Merge edits made on disk while the plugin was off (only for docs
 		// with prior local history; fresh docs seed on first sync instead).
@@ -121,7 +142,7 @@ export class Engine {
 
 	async onLocalRename(file: TFile, oldPath: string) {
 		this.onLocalDelete(oldPath);
-		if (file.extension !== "md") return;
+		if (!shouldSync(file.path, this.configDir)) return;
 		await this.openFileDoc(file.path);
 		this.setIndex(file.path, { deleted: false });
 		if (!this.pendingSeed.has(file.path)) {
@@ -166,12 +187,39 @@ export class Engine {
 		if (existing) return existing;
 		const doc = new Y.Doc();
 		const managed = await this.manage(path, doc);
-		const ytext = doc.getText("content");
-		if (ytext.length === 0) this.pendingSeed.add(path);
-		ytext.observe((_event, txn) => {
+		const onChange = (_event: unknown, txn: Y.Transaction) => {
 			if (txn.origin !== DISK) this.scheduleDiskWrite(path);
-		});
+		};
+		if (isText(path, this.configDir)) {
+			const ytext = doc.getText("content");
+			if (ytext.length === 0) this.pendingSeed.add(path);
+			ytext.observe(onChange);
+		} else {
+			const ymap = doc.getMap<Uint8Array>("blob");
+			if (!ymap.has("data")) this.pendingSeed.add(path);
+			ymap.observe(onChange);
+		}
 		return managed;
+	}
+
+	private async listConfigFiles(): Promise<string[]> {
+		const out: string[] = [];
+		const walk = async (dir: string) => {
+			let listed;
+			try {
+				listed = await this.app.vault.adapter.list(dir);
+			} catch {
+				return; // dir vanished mid-walk, nothing to sync
+			}
+			for (const f of listed.files) {
+				if (shouldSync(f, this.configDir)) out.push(f);
+			}
+			// Descend into everything; shouldSync filters files, so files under
+			// our own excluded plugin dir are simply never collected.
+			for (const sub of listed.folders) await walk(sub);
+		};
+		await walk(this.configDir);
+		return out;
 	}
 
 	private setIndex(path: string, entry: IndexEntry) {
@@ -195,10 +243,9 @@ export class Engine {
 
 	private async onIndexSynced() {
 		// Announce local files the server doesn't know about.
-		for (const file of this.app.vault.getMarkdownFiles()) {
-			if (!this.index.has(file.path)) {
-				if (!this.docs.has(file.path)) await this.openFileDoc(file.path);
-				this.setIndex(file.path, { deleted: false });
+		for (const [path] of this.docs) {
+			if (path !== INDEX_DOC && !this.index.has(path)) {
+				this.setIndex(path, { deleted: false });
 			}
 		}
 		// Materialize/apply everything the server knows.
@@ -209,34 +256,77 @@ export class Engine {
 		for (const path of paths) {
 			const entry = this.index.get(path);
 			if (!entry) continue;
-			const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
 			if (!entry.deleted) {
 				if (!this.docs.has(path)) await this.openFileDoc(path);
-				if (!(file instanceof TFile)) await this.createFileAt(path, "");
-			} else if (file instanceof TFile && this.docs.has(path)) {
-				this.suppressed.add(path);
-				try {
-					// System trash, so a remote deletion is always recoverable.
-					await this.app.vault.trash(file, true);
-				} finally {
-					this.suppressed.delete(path);
+				// A text note appears immediately as an empty file; its content
+				// follows over the sync. Blob files are written whole by
+				// writeToDisk once their bytes arrive — an empty placeholder
+				// (e.g. a 0-byte image) would be useless.
+				if (
+					isText(path, this.configDir) &&
+					!(this.app.vault.getAbstractFileByPath(normalizePath(path)) instanceof TFile)
+				) {
+					await this.createFileAt(path, "");
 				}
+			} else {
+				await this.applyRemoteDelete(path);
 			}
 		}
 	}
 
+	private async applyRemoteDelete(path: string) {
+		if (!this.docs.has(path)) return;
+		const p = normalizePath(path);
+		this.suppressed.add(path);
+		try {
+			if (isConfig(path, this.configDir)) {
+				// Config files aren't vault files; delete via the adapter.
+				if (await this.app.vault.adapter.exists(p)) {
+					if (!(await this.app.vault.adapter.trashSystem(p))) {
+						await this.app.vault.adapter.remove(p);
+					}
+				}
+			} else {
+				const file = this.app.vault.getAbstractFileByPath(p);
+				// System trash, so a remote deletion is always recoverable.
+				if (file instanceof TFile) await this.app.vault.trash(file, true);
+			}
+		} finally {
+			this.suppressed.delete(path);
+		}
+	}
+
+	/** Reads a synced file's bytes from disk, or null if it isn't there. */
+	private async readBytes(path: string): Promise<Uint8Array | null> {
+		const p = normalizePath(path);
+		if (!(await this.app.vault.adapter.exists(p))) return null;
+		return new Uint8Array(await this.app.vault.adapter.readBinary(p));
+	}
+
 	private async reconcileFromDisk(path: string) {
 		const managed = this.docs.get(path);
-		const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
-		if (!managed || !(file instanceof TFile)) return;
-		const diskContent = await this.app.vault.cachedRead(file);
-		const ytext = managed.slot.doc.getText("content");
-		if (ytext.toString() === diskContent) return;
-		const d = simpleDiffString(ytext.toString(), diskContent);
-		managed.slot.doc.transact(() => {
-			ytext.delete(d.index, d.remove);
-			ytext.insert(d.index, d.insert);
-		}, DISK);
+		if (!managed) return;
+		if (isText(path, this.configDir)) {
+			const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
+			if (!(file instanceof TFile)) return;
+			const diskContent = await this.app.vault.cachedRead(file);
+			const ytext = managed.slot.doc.getText("content");
+			if (ytext.toString() === diskContent) return;
+			const d = simpleDiffString(ytext.toString(), diskContent);
+			managed.slot.doc.transact(() => {
+				ytext.delete(d.index, d.remove);
+				ytext.insert(d.index, d.insert);
+			}, DISK);
+			return;
+		}
+		// Blob file: no character-level merge, so disk content replaces the
+		// doc value wholesale (last writer wins).
+		const disk = await this.readBytes(path);
+		if (disk === null) return;
+		const ymap = managed.slot.doc.getMap<Uint8Array>("blob");
+		const cur = ymap.get("data");
+		if (cur && equalBytes(cur, disk)) return;
+		managed.slot.doc.transact(() => ymap.set("data", disk), DISK);
 	}
 
 	private scheduleDiskWrite(path: string) {
@@ -257,15 +347,34 @@ export class Engine {
 		// Tombstoned docs still receive updates but must not reappear on disk,
 		// and files open in an editor are written by the editor binding.
 		if (!this.isAlive(path) || this.isFileOpen(path)) return;
-		const content = managed.slot.doc.getText("content").toString();
-		const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
-		if (file instanceof TFile) {
-			await this.app.vault.process(file, (data) =>
-				data === content ? data : content,
-			);
-		} else {
-			await this.createFileAt(path, content);
+		if (isText(path, this.configDir)) {
+			const content = managed.slot.doc.getText("content").toString();
+			const file = this.app.vault.getAbstractFileByPath(normalizePath(path));
+			if (file instanceof TFile) {
+				await this.app.vault.process(file, (data) =>
+					data === content ? data : content,
+				);
+			} else {
+				await this.createFileAt(path, content);
+			}
+			return;
 		}
+		const bytes = managed.slot.doc.getMap<Uint8Array>("blob").get("data");
+		if (!bytes) return;
+		const disk = await this.readBytes(path);
+		if (disk && equalBytes(disk, bytes)) return;
+		await this.writeBytesToDisk(path, bytes);
+	}
+
+	private async writeBytesToDisk(path: string, bytes: Uint8Array) {
+		const p = normalizePath(path);
+		const slash = p.lastIndexOf("/");
+		if (slash > 0) {
+			await this.app.vault.adapter.mkdir(p.slice(0, slash)).catch(() => {});
+		}
+		// docs.has(path) guards the resulting create/modify vault event, so no
+		// suppression is needed to avoid an echo.
+		await this.app.vault.adapter.writeBinary(p, toArrayBuffer(bytes));
 	}
 
 	private async createFileAt(path: string, content: string) {

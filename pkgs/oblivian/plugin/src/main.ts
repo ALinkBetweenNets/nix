@@ -2,6 +2,7 @@ import { Notice, Plugin, TFile } from "obsidian";
 import { Compartment } from "@codemirror/state";
 import { Engine } from "./engine";
 import { EditorBinder } from "./editor-binding";
+import { shouldSync } from "./paths";
 import {
 	DEFAULT_SETTINGS,
 	OblivianSettings,
@@ -76,15 +77,16 @@ export default class OblivianPlugin extends Plugin {
 		// registerEvent only detaches on plugin unload; after restartSync the
 		// old closures still fire, so gate them on being the current engine.
 		const active = () => this.engine === engine;
+		const cfg = this.app.vault.configDir;
 		this.registerEvent(
 			this.app.vault.on("create", (f) => {
-				if (active() && f instanceof TFile && f.extension === "md")
+				if (active() && f instanceof TFile && shouldSync(f.path, cfg))
 					void engine.onLocalCreate(f);
 			}),
 		);
 		this.registerEvent(
 			this.app.vault.on("delete", (f) => {
-				if (active() && f instanceof TFile && f.extension === "md")
+				if (active() && f instanceof TFile && shouldSync(f.path, cfg))
 					engine.onLocalDelete(f.path);
 			}),
 		);
@@ -95,7 +97,7 @@ export default class OblivianPlugin extends Plugin {
 		);
 		this.registerEvent(
 			this.app.vault.on("modify", (f) => {
-				if (active() && f instanceof TFile && f.extension === "md")
+				if (active() && f instanceof TFile && shouldSync(f.path, cfg))
 					void engine.onLocalModify(f);
 			}),
 		);

@@ -8,6 +8,19 @@ import { fileURLToPath } from "node:url";
 import assert from "node:assert";
 import * as Y from "yjs";
 import { MuxProvider } from "../src/provider.ts";
+import { shouldSync } from "../src/paths.ts";
+
+// Path policy (pure logic, no server needed). Security-critical: Oblivian's
+// own settings hold the vault password and must never sync.
+const cfg = ".obsidian";
+assert.equal(shouldSync("notes/a.md", cfg), true);
+assert.equal(shouldSync("attachments/img.png", cfg), true, "attachments sync");
+assert.equal(shouldSync(`${cfg}/plugins/dataview/main.js`, cfg), true, "other plugins sync");
+assert.equal(shouldSync(`${cfg}/plugins/oblivian/data.json`, cfg), false, "our own settings never sync");
+assert.equal(shouldSync(`${cfg}/workspace.json`, cfg), false, "workspace state excluded");
+assert.equal(shouldSync(".trash/x.md", cfg), false, "hidden dirs excluded");
+assert.equal(shouldSync("notes/.secret", cfg), false, "hidden files excluded");
+console.log("path policy: ok");
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
 const PORT = 19850;
@@ -69,6 +82,19 @@ try {
 		}
 		return false;
 	}, "awareness A->B");
+
+	// Binary blob round-trip: attachments/config files sync as raw bytes in a
+	// Y.Map, not collaborative text.
+	const imgA = new Y.Doc();
+	const imgBytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0, 1, 2, 250, 42]);
+	imgA.getMap("blob").set("data", imgBytes);
+	a.addDoc("attach/img.png", imgA);
+	const imgB = new Y.Doc();
+	b.addDoc("attach/img.png", imgB);
+	await until(() => {
+		const d = imgB.getMap("blob").get("data");
+		return d && d.length === imgBytes.length && d.every((v, i) => v === imgBytes[i]);
+	}, "B received A's binary blob");
 
 	// Wrong password is rejected, no retry loop.
 	const evil = new MuxProvider(wsUrl, "wrong");
