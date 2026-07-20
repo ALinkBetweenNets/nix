@@ -213,6 +213,17 @@ in
     #     }";
     #   locations."/".proxyWebsockets = true;
     # };
+    # "wallabag.${config.link.domain}" = {
+    #   # enableACME = true;
+    #   useACMEHost = config.link.domain;
+    #   forceSSL = true;
+    #   extraConfig = commonExtraConfig;
+    #   locations."/" = {
+    #     extraConfig = commonLocationExtraConfig;
+    #     proxyPass = "http://${config.link.serviceHost}:${toString config.link.services.wallabag.port}";
+    #     proxyWebsockets = true;
+    #   };
+    # };
     "vikunja.${config.link.domain}" = {
       # enableACME = true;
       useACMEHost = config.link.domain;
