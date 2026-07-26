@@ -209,7 +209,7 @@ with lib;
         pavucontrol
         ## Multimedia
         vlc
-        cobang # qr codes
+        # cobang # qr codes
         ## Encryption
         deno # for yt-dlp
         #veracrypt
