@@ -37,6 +37,7 @@ in
         extensions =
           with pkgs.vscode-extensions;
           [
+            antfu.slidev
             # continue.continue # ollama
             # bradlc.vscode-tailwindcss
             # christian-kohler.npm-intellisense
