@@ -126,6 +126,9 @@ in
           "[jsonc]" = {
             "editor.defaultFormatter" = "vscode.json-language-features";
           };
+          "[css]"= {
+            "editor.defaultFormatter"= "vscode.css-language-features";
+          };
           "chat.disableAIFeatures" = false;
           "cSpell.language"="en,de";
           "github.copilot.enable.*" = false;
