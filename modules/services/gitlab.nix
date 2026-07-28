@@ -115,6 +115,7 @@ in
         databaseCreateLocally = true;
         databasePasswordFile = config.sops.secrets."gitlab/dbPass".path;
         initialRootPasswordFile = config.sops.secrets."gitlab/initialRoot".path;
+        extraEnv={SIDEKIQ_LOG_LEVEL = "WARN";};
         extraConfig = {
           gitlab = {
             trusted_proxies = [
