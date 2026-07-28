@@ -8,6 +8,12 @@
 with lib;
 let
   cfg = config.link.fs.luks;
+  # sshd stats the passwd shell as a literal path, so a value with an
+  # argument ("/bin/systemctl default") is rejected as "shell does not exist".
+  # Wrap the unlock in a single real executable instead.
+  initrdUnlock = pkgs.writeShellScript "initrd-unlock" ''
+    exec /bin/systemctl default
+  '';
 in
 {
   options.link.fs.luks.enable = mkEnableOption "activate luks";
@@ -74,7 +80,7 @@ in
           ssh = {
             enable = true;
             port = 25222;
-            shell = lib.mkForce "/bin/systemctl default";
+            shell = lib.mkForce "${initrdUnlock}";
             hostKeys = [ /etc/initrd_id_ed25519 ];
             # authorizedKeys = [
             #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIOaLOyxsr6wgj0JoG/OrDywND2hG2nblOGUuZBPFG1U l@xn"
@@ -85,6 +91,7 @@ in
           };
         };
         availableKernelModules = [ "r8169" ]; # should work for most network hardware
+        systemd.storePaths = [ "${initrdUnlock}" ];
       };
     };
   };
