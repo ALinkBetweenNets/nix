@@ -41,7 +41,7 @@ in
       "/share/zsh"
       # "/share/fish"
     ];
-    systemd.services.decrypt-sops = lib.mkIf link.sops{
+    systemd.services.decrypt-sops = lib.mkIf config.link.sops{
       description = "Decrypt sops secrets";
       wantedBy = [ "multi-user.target" ];
       after = [ "network-online.target" ];
