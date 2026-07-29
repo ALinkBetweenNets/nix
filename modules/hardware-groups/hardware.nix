@@ -28,5 +28,10 @@ in {
       };
     };
     zramSwap.enable = true;
+    # zram is RAM-speed; prefer it over dropping page cache under pressure.
+    # The btrfs hibernation swapfile keeps its low priority, so it's only used
+    # once zram fills — hibernation/resume_offset unaffected.
+    # mkDefault so any host can still override.
+    boot.kernel.sysctl."vm.swappiness" = lib.mkDefault 150;
   };
 }
