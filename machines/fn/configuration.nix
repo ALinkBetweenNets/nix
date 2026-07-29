@@ -140,6 +140,11 @@ home-manager,
   home-manager.users.l = flake-self.homeConfigurations.laptop;
   boot = {
     initrd.systemd.enable = true;
+    # Framework 16 780M: force full panel-self-refresh/Panel Replay off to stop
+    # green horizontal-stripe framebuffer corruption. nixos-hardware sets 0x10
+    # (PSR only); 0x410 also disables PSR-SU + Panel Replay (the regression).
+    # last-value-wins override; drop once nixos-hardware bumps 7040 to 0x410.
+    kernelParams = lib.mkAfter [ "amdgpu.dcdebugmask=0x410" ];
     # kernelParams = [
     #   "btusb.enable_autosuspend=0"
     #   "usbcore.autosuspend=-1"
