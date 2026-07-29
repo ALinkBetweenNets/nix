@@ -98,9 +98,9 @@
       ];
       # Enable flakes
       experimental-features = [ "nix-command" "flakes" ];
-      # Save space by hardlinking store files
-      auto-optimise-store = true;
     };
+    # Hardlink-dedupe the store on a timer instead of inline after every build
+    # (auto-optimise-store), which added latency to each nixos-rebuild.
     optimise.automatic = true;
     gc = {
       persistent = false;
