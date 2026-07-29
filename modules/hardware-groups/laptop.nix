@@ -19,9 +19,13 @@ in
       enable=true;
       interface = "wlp1s0";
     };
+    boot.loader.timeout = 1; # was default 5s; hold Space at the menu to pick an older generation
+    networking.dhcpcd.enable = false;
+    services.hardware.bolt.enable = true;
     environment.systemPackages = with pkgs; [
       wireless-regdb
       kdePackages.kconfig
+      kdePackages.plasma-thunderbolt
 
     ];
     boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];

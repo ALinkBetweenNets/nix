@@ -165,11 +165,9 @@ home-manager,
   environment.systemPackages = with pkgs; [
     kdePackages.frameworkintegration
     framework-tool-tui
-    kdePackages.plasma-thunderbolt
     fw-ectool
     framework-tool
   ];
-  services.hardware.bolt.enable = true;
   #services.fprintd = {
   #  enable = true;
   #  tod.enable = true;
@@ -181,8 +179,6 @@ home-manager,
   # wg-link -> graphical.target. Disabling the dhcpcd service gates it out
   # unconditionally; NM's own wait-online gates network-online instead, and
   # wg-link reconnects via persistentKeepalive.
-  networking.dhcpcd.enable = false;
-  boot.loader.timeout = 1; # was default 5s; hold Space at the menu to pick an older generation
   networking = {
     hostId = "007f0200";
     firewall = {
