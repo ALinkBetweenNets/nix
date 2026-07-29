@@ -136,7 +136,6 @@ home-manager,
         # };
       };
   };
-  hardware.enableRedistributableFirmware = true;
   home-manager.users.l = flake-self.homeConfigurations.laptop;
   boot = {
     initrd.systemd.enable = true;
@@ -164,7 +163,6 @@ home-manager,
   #powerManagement.scsiLinkPolicy = "med_power_with_dipm";
   # systemd.extraConfig = "DefaultLimitNOFILE=2048";
   # security.protectKernelImage = false;
-  hardware.firmware = [ pkgs.linux-firmware];
   environment.systemPackages = with pkgs; [
     kdePackages.frameworkintegration
     framework-tool-tui
