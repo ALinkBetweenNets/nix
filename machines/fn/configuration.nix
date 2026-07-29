@@ -176,6 +176,14 @@ home-manager,
   #  tod.enable = true;
   #  tod.driver = pkgs.libfprint-2-tod1-vfs0090;
   #};
+  # NetworkManager owns networking on this laptop; the scripted dhcpcd (kept alive
+  # by wlp1s0's default useDHCP=true) ran redundantly and stalled ~30s waiting for
+  # DHCP leases on interfaces without one, blocking network-online.target ->
+  # wg-link -> graphical.target. Disabling the dhcpcd service gates it out
+  # unconditionally; NM's own wait-online gates network-online instead, and
+  # wg-link reconnects via persistentKeepalive.
+  networking.dhcpcd.enable = false;
+  boot.loader.timeout = 1; # was default 5s; hold Space at the menu to pick an older generation
   networking = {
     hostId = "007f0200";
     firewall = {
