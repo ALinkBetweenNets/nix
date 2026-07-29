@@ -17,6 +17,7 @@
   system.autoUpgrade.enable = lib.mkForce false;
   link = {
     common.enable = true;
+    sops=true;
     server.enable = true;
     wg-link.enable = true;
     wg-link.address = "10.5.5.5/24";
@@ -164,6 +165,7 @@
   users.users.root.openssh.authorizedKeys.keys = [
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBu+WcpENdr7FaCIwj6WsinGnykIPV/tnIyrfEHSeU+E root@sn"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBPNmPVkmr2mwwaCC4BdOk6okmk9mL7eOAA4sTuvdE+p root@nn"
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMr/eZKE015HukAURimtIgKg4F8c7aImxlsSjavGFqs5 l@nn"
   ];
   nix.settings.auto-optimise-store = true;
   # services.cloudflare-dyndns = {
