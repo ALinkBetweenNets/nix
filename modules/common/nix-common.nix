@@ -24,6 +24,7 @@
     };
     # stateVersion = "23.11";
   };
+  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
   home-manager = {
     useUserPackages = true;
     extraSpecialArgs = {

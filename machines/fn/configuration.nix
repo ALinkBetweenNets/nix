@@ -148,7 +148,6 @@ home-manager,
     #   "btusb.enable_autosuspend=0"
     #   "usbcore.autosuspend=-1"
     # ];
-    binfmt.emulatedSystems = [ "aarch64-linux" ];
     # kernel.sysctl."kernel.sysrq" = 1;
     # Alt+FN+S+key (on other devices Alt+Print+key)
     # h -> help (Output in journal)

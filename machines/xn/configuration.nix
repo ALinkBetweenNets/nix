@@ -95,7 +95,6 @@
   hardware.trackpoint.emulateWheel = lib.mkDefault config.hardware.trackpoint.enable;
   hardware.sensor.iio.enable = true;
   #powerManagement.scsiLinkPolicy = "med_power_with_dipm";
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
   #environment.systemPackages = with pkgs;    [ ];
   system.stateVersion = "23.11";
 }

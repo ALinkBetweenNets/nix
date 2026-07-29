@@ -1,6 +1,17 @@
 { config, system-config, pkgs, lib, ... }:
 with lib;
 let cfg = config.link.plymouth;
+adiTarget2 = pkgs.adi1090x-plymouth-themes.override {
+  selected_themes = [ "target_2" ];
+};
+
+patchedTarget2 = adiTarget2.overrideAttrs (old: {
+  postInstall = (old.postInstall or "") + ''
+    cp ${./target_2.script} \
+      $out/share/plymouth/themes/target_2/target_2.script
+    '';
+  });
+
 in {
   options.link.plymouth = { enable = mkEnableOption "activate plymouth"; };
   config = mkIf cfg.enable {
@@ -10,9 +21,10 @@ in {
         themePackages = with pkgs;
           [
             # By default we would install all themes
-            (adi1090x-plymouth-themes.override {
-              selected_themes = [ "target_2" ];
-            })
+            # (adi1090x-plymouth-themes.override {
+              # selected_themes = [ "target_2" ];
+            # })
+            patchedTarget2
           ];
         theme = "target_2";
         # logo = pkgs.fetchurl {

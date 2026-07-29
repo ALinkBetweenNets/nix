@@ -13,7 +13,6 @@
   };
   services.smartd.enable = false;
   networking.hostName = "in";
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
   environment.systemPackages = with pkgs; [ ];
   #system.stateVersion = "23.05";
 }

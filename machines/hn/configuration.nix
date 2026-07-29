@@ -12,7 +12,6 @@
     gnome.enable = true;
   };
   networking.hostName = "hn";
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ]; # Is this needed?
   environment.systemPackages = with pkgs; [ ];
   #system.stateVersion = "23.05";
 }
