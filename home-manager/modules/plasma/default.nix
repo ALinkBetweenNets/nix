@@ -99,7 +99,19 @@ in {
         "kservicemenurc"."Show"."slideshowfileitemaction" = true;
         "kservicemenurc"."Show"."tagsfileitemaction" = true;
         "kservicemenurc"."Show"."wallpaperfileitemaction" = true;
-        "ksmserverrc"."General"."loginMode" = "restoreSavedSession";
+        # Perf: don't relaunch every previously-open app on login. "restoreSavedSession"
+        # made "password entered -> usable taskbar" slow because Plasma re-spawned the
+        # whole last session during startup. Empty session = desktop is ready immediately.
+        "ksmserverrc"."General"."loginMode" = "emptySession";
+        # Perf: Baloo had indexed ~2M files (6.6 GiB index); the file indexer churned
+        # disk/CPU and made plasmashell (which draws the Meta launcher) laggy. Disable
+        # file indexing entirely. Trade-off: no KRunner/Dolphin filename/content search.
+        # (Existing index purged once with `balooctl6 disable`.)
+        "baloofilerc"."Basic Settings"."Indexing-Enabled" = false;
+        # Perf: the animated splash ("beautifultreeanimationp6") has a minimum display
+        # time that delayed the desktop appearing. None = no splash, desktop shows sooner.
+        "ksplashrc"."KSplash"."Theme" = "None";
+        "ksplashrc"."KSplash"."Engine" = "none";
         "kwinrc"."Desktops"."Id_1" = "6268f093-e850-4a30-a436-befc9272e3d8";
         "kwinrc"."Desktops"."Id_2" = "4094dafc-06e8-411b-b328-0041d7dd28fd";
         "kwinrc"."Desktops"."Id_3" = "01671e7a-3d07-41ee-b059-2694a0488ec8";
@@ -114,8 +126,11 @@ in {
         "kwinrc"."NightColor"."TransitionTime" = 180;
         "kwinrc"."org.kde.kdecoration2"."ButtonsOnLeft" = "MNH";
         "kwinrc"."org.kde.kdecoration2"."ButtonsOnRight" = "SLBFIAX";
-        "kwinrc"."Plugins"."blurEnabled" = true;
-        "kwinrc"."Plugins"."contrastEnabled" = true;
+        # Perf: blur + background-contrast make the compositor repaint the region behind
+        # translucent surfaces (Kickoff menu, panels) every frame, adding latency to the
+        # Meta launcher appearing. Off = flatter look, snappier menus, less GPU work.
+        "kwinrc"."Plugins"."blurEnabled" = false;
+        "kwinrc"."Plugins"."contrastEnabled" = false;
         "kwinrc"."Plugins"."desktopchangeosdEnabled" = true;
         "kwinrc"."Plugins"."dimscreenEnabled" = true;
         "kwinrc"."Plugins"."fadedesktopEnabled" = true;
