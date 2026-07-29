@@ -93,20 +93,6 @@ home-manager,
       ];
     };
   };
-  systemd.services.decrypt-sops = {
-    description = "Decrypt sops secrets";
-    wantedBy = [ "multi-user.target" ];
-    after = [ "network-online.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      # in network is not ready
-      Restart = "on-failure";
-      RestartSec = "2s";
-    };
-    script = config.system.activationScripts.setupSecrets.text;
-  };
-
   containers.tor-container = {
     # autoStart = true;
     config =
