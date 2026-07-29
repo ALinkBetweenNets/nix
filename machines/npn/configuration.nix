@@ -156,7 +156,6 @@
   #   daemon.enable = true;
   #   updater.enable = true;
   # };
-  nix.settings.auto-optimise-store = true;
   # services.cloudflare-dyndns = {
   #   ipv4 = lib.mkForce false;
   #   ipv6 = lib.mkForce false;

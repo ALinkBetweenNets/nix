@@ -167,7 +167,6 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBPNmPVkmr2mwwaCC4BdOk6okmk9mL7eOAA4sTuvdE+p root@nn"
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMr/eZKE015HukAURimtIgKg4F8c7aImxlsSjavGFqs5 l@nn"
   ];
-  nix.settings.auto-optimise-store = true;
   # services.cloudflare-dyndns = {
   #   ipv4 = lib.mkForce false;
   #   ipv6 = lib.mkForce false;
