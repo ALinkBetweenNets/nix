@@ -187,7 +187,30 @@ home-manager,
     hostName = "fn";
     domain = "monitor-banfish.ts.net";
   };
-  services.languagetool.enable = true;
+  # LanguageTool on demand instead of a 24/7 ~210 MB idle JVM: a localhost
+  # socket on the public port hands connections to systemd-socket-proxyd, which
+  # starts the real server (internal port 8082) on first use and lets it stop
+  # when idle. First request after idle pays the JVM startup delay (~seconds).
+  # proxyd because LanguageTool's server can't accept socket fds itself.
+  services.languagetool = {
+    enable = true;
+    port = 8082; # internal; clients keep hitting localhost:8081 via the proxy
+  };
+  systemd.services.languagetool = {
+    wantedBy = lib.mkForce [ ]; # don't start at boot
+    unitConfig.StopWhenUnneeded = true; # stop once the proxy goes idle
+    # gate "started" on the port being up so proxyd doesn't race the JVM
+    serviceConfig.ExecStartPost = "${pkgs.bash}/bin/bash -c 'for ((i=0;i<120;i++)); do (echo > /dev/tcp/127.0.0.1/8082) 2>/dev/null && exit 0; ${pkgs.coreutils}/bin/sleep 0.5; done; exit 1'";
+  };
+  systemd.sockets.languagetool-proxy = {
+    wantedBy = [ "sockets.target" ];
+    listenStreams = [ "127.0.0.1:8081" ]; # public port, localhost only
+  };
+  systemd.services.languagetool-proxy = {
+    requires = [ "languagetool.service" ];
+    after = [ "languagetool.service" ];
+    serviceConfig.ExecStart = "${config.systemd.package}/lib/systemd/systemd-socket-proxyd --exit-idle-time=5min 127.0.0.1:8082";
+  };
   # services.ucodenix = {
   #   enable = true;
   #   cpuSerialNumber =
