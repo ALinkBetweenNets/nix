@@ -117,10 +117,12 @@ in {
           "--keep-monthly 12"
           "--keep-yearly 75"
         ];
+        # staggered per target so multiple repos don't back up the same paths
+        # at once; 30m jitter stays inside each 1h slot.
         timerConfig = {
-          OnCalendar = "03:00";
+          OnCalendar = "01:00";
           Persistent = true;
-          RandomizedDelaySec = "5h";
+          RandomizedDelaySec = "30m";
         };
         extraBackupArgs = [
           "--exclude-file=${restic-ignore-file}"
@@ -146,9 +148,9 @@ in {
           "--keep-yearly 75"
         ];
         timerConfig = {
-          OnCalendar = "03:00";
+          OnCalendar = "02:00";
           Persistent = true;
-          RandomizedDelaySec = "5h";
+          RandomizedDelaySec = "30m";
         };
         extraBackupArgs = [
           "--exclude-file=${restic-ignore-file}"
@@ -173,7 +175,7 @@ in {
         timerConfig = {
           OnCalendar = "03:00";
           Persistent = true;
-          RandomizedDelaySec = "5h";
+          RandomizedDelaySec = "30m";
         };
         extraBackupArgs = [
           "--exclude-file=${restic-ignore-file}"
@@ -196,9 +198,9 @@ in {
           "--keep-yearly 75"
         ];
         timerConfig = {
-          OnCalendar = "03:00";
+          OnCalendar = "04:00";
           Persistent = true;
-          RandomizedDelaySec = "5h";
+          RandomizedDelaySec = "30m";
         };
         extraBackupArgs = [
           "--exclude-file=${restic-ignore-file}"
@@ -221,9 +223,9 @@ in {
           "--keep-yearly 75"
         ];
         timerConfig = {
-          OnCalendar = "03:00";
+          OnCalendar = "05:00";
           Persistent = true;
-          RandomizedDelaySec = "5h";
+          RandomizedDelaySec = "30m";
         };
         extraBackupArgs = [
           "--exclude-file=${restic-ignore-file}"
@@ -276,9 +278,9 @@ in {
           "--keep-yearly 75"
         ];
         timerConfig = {
-          OnCalendar = "03:00";
+          OnCalendar = "06:00";
           Persistent = true;
-          RandomizedDelaySec = "5h";
+          RandomizedDelaySec = "30m";
         };
         extraBackupArgs = [
           "--exclude-file=${restic-ignore-file}"
