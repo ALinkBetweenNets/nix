@@ -20,6 +20,12 @@ in
       };
       desktopManager.plasma6.enable = true;
     };
+    # DrKonqi's coredump pickup runs `--pickup` at every Plasma login and
+    # processes the whole systemd-coredump backlog serially, stalling the
+    # session for up to a minute. Mask it; live crash dialogs still work.
+    systemd.user.services.drkonqi-coredump-pickup.enable = false;
+    # Cap the coredump pool so it never grows unbounded again.
+    systemd.coredump.settings.Coredump.MaxUse = "512M";
     environment.systemPackages = with pkgs; [
       kdePackages.sddm-kcm # sddm config module
       kdePackages.kirigami
