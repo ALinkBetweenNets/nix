@@ -307,18 +307,17 @@ in
     #     proxyWebsockets = true;
     #   };
     # };
-    # "grafana.alinkbn.de" = {
-    #   # enableACME = true;
-    #   useACMEHost = "alinkbn.de";
-    #   forceSSL=true;
-    # extraConfig = commonExtraConfig;
-    #   locations."/" = {
-    #     extraConfig = commonLocationExtraConfig;
-    # proxyPass =
-    #       "http://100.98.35.19:${toString config.link.services.grafana.port}/";
-    #     proxyWebsockets = true;
-    #   };
-    # };
+    "ak.bettuna.de" = {
+      enableACME = true;
+      forceSSL=true;
+    extraConfig = commonExtraConfig;
+      locations."/" = {
+        extraConfig = commonLocationExtraConfig;
+    proxyPass =
+          "http://10.10.10.60:8000";
+        proxyWebsockets = true;
+      };
+    };
     "gitlab.${config.link.domain}" = {
       # enableACME = true;
       useACMEHost = config.link.domain;
