@@ -15,8 +15,13 @@ in
     enable = mkEnableOption "activate laptop";
   };
   config = mkIf cfg.enable {
-    programs.captive-browser={
-      enable=true;
+    boot.kernelParams = [
+      "cfg80211.ieee80211_regdom=DE"
+    ];
+    networking.wireless.athUserRegulatoryDomain = true;
+    networking.networkmanager.wifi.powersave = false;
+    programs.captive-browser = {
+      enable = true;
       interface = "wlp1s0";
     };
     boot.loader.timeout = 1; # was default 5s; hold Space at the menu to pick an older generation
