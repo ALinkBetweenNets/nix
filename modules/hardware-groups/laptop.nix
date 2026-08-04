@@ -74,6 +74,9 @@ in
     #options.type = "laptop";
     #networking.wireless.enable = !config.networking.networkmanager.enable;
     networking.networkmanager = {
+      plugins = with pkgs; [
+        networkmanager-openvpn
+      ];
       wifi.macAddress = "stable";
     };
     hardware.bluetooth.enable = true;

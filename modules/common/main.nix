@@ -95,7 +95,6 @@ in
       rclone
       ddcui
       ddcutil
-      networkmanager-openvpn
       android-tools
       cpio
       net-tools
