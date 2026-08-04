@@ -309,12 +309,11 @@ in
     # };
     "ak.bettuna.de" = {
       enableACME = true;
-      forceSSL=true;
-    extraConfig = commonExtraConfig;
+      forceSSL = true;
+      extraConfig = commonExtraConfig;
       locations."/" = {
         extraConfig = commonLocationExtraConfig;
-    proxyPass =
-          "http://10.10.10.60:8000";
+        proxyPass = "http://10.10.10.60:8000";
         proxyWebsockets = true;
       };
     };
