@@ -60,6 +60,7 @@
     podman.enable = true;
     # service-ports-expose = true;
     services = {
+      vaultwarden.enable = true;
       #   radicale.enable = true;
       #   netbox.enable = true;
       #   # part-db.enable = true;
