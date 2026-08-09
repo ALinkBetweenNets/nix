@@ -44,6 +44,7 @@ in
       kernelParams = [ "ip=dhcp" ];
       ## This enables initrd to run a ssh server for entering the password for luks decryption
       initrd = {
+        systemd.users.root.shell = lib.mkForce "${initrdUnlock}";
         # secrets = {
         #   "/etc/secrets/initrd/ed25519.key" = /etc/secrets/initrd/ed25519.key;
         # };
@@ -80,7 +81,6 @@ in
           ssh = {
             enable = true;
             port = 25222;
-            shell = lib.mkForce "${initrdUnlock}";
             hostKeys = [ /etc/initrd_id_ed25519 ];
             # authorizedKeys = [
             #   "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIIOaLOyxsr6wgj0JoG/OrDywND2hG2nblOGUuZBPFG1U l@xn"
