@@ -210,14 +210,14 @@
   #     "ro"
   #   ]; # read only, wouldnt want a onedrive mess up to be able to affect the main repo
   # };
-  services.postgresql.package = pkgs.postgresql_16; # prevent major upgrades
+  services.postgresql.package = pkgs.postgresql_17; # prevent major upgrades
   environment.systemPackages = with pkgs; [
     rclone
     (
       let
         # XXX specify the postgresql package you'd like to upgrade to.
         # Do not forget to list the extensions you need.
-        newPostgres = pkgs.postgresql_16.withPackages (pp: [
+        newPostgres = pkgs.postgresql_17.withPackages (pp: [
           # pp.plv8
         ]);
         cfg = config.services.postgresql;
