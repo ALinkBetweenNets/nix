@@ -64,7 +64,6 @@ in
       # nftables.enable = lib.mkDefault true;
       # fail2ban.enable = lib.mkDefault true;
     };
-    # services.postgresql.package = pkgs.postgresql_17; # prevent major upgrades
     security = {
       sudo.wheelNeedsPassword = lib.mkDefault false;
       # polkit = {
