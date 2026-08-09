@@ -62,7 +62,8 @@ in
       #teamviewer.enable = true;
       mullvad-vpn = {
         enable = true;
-        package = pkgs.mullvad-vpn; # gui version
+        # package = pkgs.mullvad-vpn; # gui version
+        gui.enable = true;
       };
       udev = {
         # packages = [ pkgs.android-udev-rules ];

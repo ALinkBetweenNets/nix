@@ -36,6 +36,7 @@ in
     environment.systemPackages =
       with pkgs;
       [
+        mullvad-vpn
         kdePackages.kimageformats
         kdePackages.qtimageformats
         kdePackages.phonon
