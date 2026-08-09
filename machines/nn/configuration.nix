@@ -61,6 +61,7 @@
     # service-ports-expose = true;
     services = {
       vaultwarden.enable = true;
+      vaultwarden.expose-port = true;
       #   radicale.enable = true;
       #   netbox.enable = true;
       #   # part-db.enable = true;

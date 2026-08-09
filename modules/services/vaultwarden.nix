@@ -45,7 +45,7 @@ in
         backupDir = "${config.link.storage}/backup/vaultwarden/";
         environmentFile = config.sops.secrets."vaultwarden".path;
         dbBackend = "sqlite";
-        domain = "https://vaultwarden.${config.link.domain}";
+        domain = "http://nn:8222";
         config = {
           SIGNUPS_ALLOWED = false;
           ROCKET_ADDRESS = if cfg.expose-port then "0.0.0.0" else "127.0.0.1";
