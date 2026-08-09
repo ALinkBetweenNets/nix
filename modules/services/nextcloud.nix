@@ -43,6 +43,7 @@ in {
         package = pkgs.nextcloud34;
         hostName = "nextcloud.${config.link.domain}";
         settings.trusted_proxies = [ "100.86.79.82" ];
+        maxUploadSize="80G";
         config = {
           dbtype = "sqlite";
           adminuser = "l";
