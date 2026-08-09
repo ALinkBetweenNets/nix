@@ -93,6 +93,7 @@ in
             root_domain = "s3w.alinkbetweennets.de";
           };
           admin.admin_token_file = config.sops.secrets."garage/admin-token".path;
+          admin.metrics_require_token=true;
           replication_factor = 1;
           compression_level = 10;
         };
