@@ -63,7 +63,7 @@ in
         modules = with pkgs.nginxModules; [ geoip2 ]; # echo
         buildInputs = oldAttrs.buildInputs ++ [ pkgs.libmaxminddb ];
       };
-      clientMaxBodySize = "6000m";
+      clientMaxBodySize = "80G";
       sslProtocols = "TLSv1.2 TLSv1.3";
       # sslCiphers = "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305:@SECLEVEL=2"; # Mozilla recommendation
       sslCiphers = ''
