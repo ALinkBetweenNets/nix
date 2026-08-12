@@ -22,6 +22,7 @@ in
       tailscale.enable = true;
       qmk.enable = true;
     };
+    boot.blacklistedKernelModules = [ "hackrf" ];
     services.languagetool = {
       enable = true;
       port = 8082; # internal; clients keep hitting localhost:8081 via the proxy
