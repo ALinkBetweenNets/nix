@@ -143,11 +143,11 @@
     enable = true;
     port = 11434;
     host = "0.0.0.0";
-    loadModels = [
-      "llama3.1:70b"
-      "nomic-embed-text"
-      "starcoder2:3b"
-    ];
+    # loadModels = [
+    #   "llama3.1:70b"
+    #   "nomic-embed-text"
+    #   "starcoder2:3b"
+    # ];
   };
   # services.owncast = {
   #   enable = true;

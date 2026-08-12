@@ -32,7 +32,7 @@ in {
         enable = true;
         port = cfg.port;
         host = if cfg.expose-port then "0.0.0.0" else "127.0.0.1";
-        loadModels = [ "gemma3:27b" "nomic-embed-text" ];
+        # loadModels = [ "gemma3:27b" "nomic-embed-text" ];
       };
       nextjs-ollama-llm-ui = {
         enable = true;
