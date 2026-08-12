@@ -429,7 +429,18 @@ in
     # extraConfig = commonExtraConfig;
     #   root = "/var/www/bettuna";
     # };
-    "timertest.${config.link.domain}" = {
+    "bjoern-carlberg.${config.link.domain}" = {
+      quic = true;
+      http3_hq = true;
+      http3 = true;
+      # enableACME = true;
+      serverAliases = [
+      ];
+      useACMEHost = config.link.domain;
+      forceSSL = true;
+      extraConfig = commonExtraConfig;
+      root = "/var/www/aboutme/";
+    };"timertest.${config.link.domain}" = {
       quic = true;
       http3_hq = true;
       http3 = true;
