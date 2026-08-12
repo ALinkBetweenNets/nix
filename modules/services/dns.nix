@@ -1,23 +1,33 @@
-{ config, system-config, pkgs, lib, ... }:
+{
+  config,
+  system-config,
+  pkgs,
+  lib,
+  ...
+}:
 with lib;
-let cfg = config.link.dns;
-in {
+let
+  cfg = config.link.dns;
+in
+{
   options.link.dns.enable = mkEnableOption "activate dns";
   config = mkIf cfg.enable {
     link.unbound.enable = true;
     networking = {
       resolvconf.useLocalResolver = true;
       networkmanager.enable = true;
-      # networkmanager.dns = "systemd-resolved";
       networkmanager.dns = "none";
-      search = [ "local" "monitor-banfish.ts.net" ];
+      search = [
+        "local"
+        "monitor-banfish.ts.net"
+      ];
+      nameservers = [ "127.0.0.1" ];
     };
-    services.resolved = {
-      settings.Resolve = {
-        DNS = [ "127.0.0.1" ];
-        Domains = [ "monitor-banfish.net" "local" ];
-      };
-    };
+    # services.mullvad-vpn pulls in resolved via mkDefault. resolved owns
+    # /etc/resolv.conf (-> 127.0.0.53 stub) and only falls back to its global
+    # DNS= when no link supplies one, so per-link servers (wg-link, DHCP) win
+    # over 127.0.0.1 and every lookup dies on whichever of them is unreachable.
+    services.resolved.enable = mkForce false;
     # networking.nameservers = [
     #   # "127.0.0.1"
     #   "9.9.9.9"
