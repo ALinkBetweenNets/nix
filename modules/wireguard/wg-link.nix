@@ -32,10 +32,9 @@ in
           cfg.address
           # "fdc9:281f:04d7:9ee9::2/64"
         ];
-        dns = [
-          "10.5.5.1"
-          "fdc9:281f:04d7:9ee9::1"
-        ];
+        # no dns = here on purpose. wg-quick pushes these into
+        # resolvconf system-wide; 10.5.5.1 is only reachable over the tunnel and
+        # stalls every lookup when it isn't. unbound + extraHosts cover the peers.
         privateKeyFile = "/root/.wg-keys/private";
         peers = [
           {
