@@ -59,6 +59,7 @@
       # searx.enable = true;
       # cockpit.enable = true;
       microbin.enable = true;
+      # shlink.enable = true;
       # mailserver.enable = true;
       cryptpad.enable = true;
       # photoprism.enable = true; # WIP
