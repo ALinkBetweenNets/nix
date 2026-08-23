@@ -50,6 +50,7 @@ with lib;
           config.enable_kitty_keyboard = true
           config.enable_wayland = true
           config.max_fps=120
+          config.enable_kitty_graphics=true
           return config
         '';
         #     window_background_opacity=0.7,
@@ -60,60 +61,61 @@ with lib;
         #   };
         # };
       };
-      # kitty = {
-      #   enable = false;
-      #   enableGitIntegration = true;
-      #   environment = {"LS_COLORS" = "1";};
-      #   shellIntegration.enableZshIntegration=true;
-      #   font = {
-      #     name="FiraCode Nerd Font";
-      #   };
-      #   keybindings ={
-      #     # "ctrl+shift+f"="SplitVertical={domain=\"CurrentPaneDomain\"}";
-      #     # "ctrl+shift+n"="SplitHorizontal={domain=\"CurrentPaneDomain\"}";
-      #     "ctrl+shift+n"="new_os_window";
-      #     "ctrl+shift+enter"="new_window";
-      #     "ctrl+shift+x"="close_window";
-      #     "ctrl+shift+r"="start_resizing_window";
-      #     "ctrl+tab"="next_tab";
-      #     "ctrl+shift+tab"="previous_tab";
-      #     "ctrl+alt+shift+right"="next_tab";
-      #     "ctrl+alt+shift+left"="previous_tab";
-      #     "ctrl+shift+left"="previous_window";
-      #     "ctrl+shift+right"="next_window";
-      #     "ctrl+shift+space"="focus_visible_window";
-      #     "ctrl+alt+shift+down"="move_window_forward";
-      #     "ctrl+alt+shift+up"="move_window_backward";
-      #     "ctrl+alt+shift+f"="toggle_layout stack";
-      #     # ctrl shift a 1 -> disable background transparency
-      #     # ctrl shift a d -> reset background transparency to default
-      #   };
-      #   settings = {
-      #     # themeFile = "LiquidCarbonTransparent";
-      #     background_opacity = 0.7;
-      #     dynamic_background_opacity = "yes";
-      #     transparent_background_colors = "#000000@1";
-      #     scrollback_lines=10000;
-      #     enable_audio_bell=true;
-      #     scrollback_pager_history_size=10;
-      #     notify_on_cmd_finish ="invisible 10";
-      #     # hide_window_decorations="yes";
-      #     tab_bar_style="powerline";
-      #     tab_bar_edge="bottom";
-      #     ttab_powerline_style = "slanted";
-      #     # tab_powerline_style="round";
-      #     cursor_trail=100;
-      #     cursor_trail_decay = "0.1 0.2";
-      #     cursor_trail_start_threshold = 4;
-      #     # window_margin_width=1;
-      #     # window_border_width =    "1pt";
-      #     active_border_color=     "#44ffff";
-      #     single_window_margin=0;
-      #     enabled_layouts="grid,tall,fat,vertical,horizontal,splits,stack";
-      #
-      #   };
-      #
-      # };
+      kitty = {
+        enable = true;
+        settings.shell = "${pkgs.zellij}/bin/zellij";
+        enableGitIntegration = true;
+        environment = {"LS_COLORS" = "1";};
+        shellIntegration.enableZshIntegration=true;
+        font = {
+          name="FiraCode Nerd Font";
+        };
+        keybindings ={
+          # "ctrl+shift+f"="SplitVertical={domain=\"CurrentPaneDomain\"}";
+          # "ctrl+shift+n"="SplitHorizontal={domain=\"CurrentPaneDomain\"}";
+          "ctrl+shift+n"="new_os_window";
+          "ctrl+shift+enter"="new_window";
+          "ctrl+shift+x"="close_window";
+          "ctrl+shift+r"="start_resizing_window";
+          "ctrl+tab"="next_tab";
+          "ctrl+shift+tab"="previous_tab";
+          "ctrl+alt+shift+right"="next_tab";
+          "ctrl+alt+shift+left"="previous_tab";
+          "ctrl+shift+left"="previous_window";
+          "ctrl+shift+right"="next_window";
+          "ctrl+shift+space"="focus_visible_window";
+          "ctrl+alt+shift+down"="move_window_forward";
+          "ctrl+alt+shift+up"="move_window_backward";
+          "ctrl+alt+shift+f"="toggle_layout stack";
+          # ctrl shift a 1 -> disable background transparency
+          # ctrl shift a d -> reset background transparency to default
+        };
+        settings = {
+          # themeFile = "LiquidCarbonTransparent";
+          # background_opacity = 0.7;
+          # dynamic_background_opacity = "yes";
+          # transparent_background_colors = "#000000@1";
+          scrollback_lines=10000;
+          enable_audio_bell=true;
+          scrollback_pager_history_size=10;
+          notify_on_cmd_finish ="invisible 10";
+          # hide_window_decorations="yes";
+          tab_bar_style="powerline";
+          tab_bar_edge="bottom";
+          ttab_powerline_style = "slanted";
+          # tab_powerline_style="round";
+          cursor_trail=100;
+          cursor_trail_decay = "0.1 0.2";
+          cursor_trail_start_threshold = 4;
+          # window_margin_width=1;
+          # window_border_width =    "1pt";
+          active_border_color=     "#44ffff";
+          single_window_margin=0;
+          enabled_layouts="grid,tall,fat,vertical,horizontal,splits,stack";
+
+        };
+
+      };
       firefox = {
         enable = true;
         configPath = ".mozilla/firefox";
