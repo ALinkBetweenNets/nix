@@ -129,6 +129,7 @@ in
           "[css]"= {
             "editor.defaultFormatter"= "vscode.css-language-features";
           };
+          "workbench.activityBar.compact"= true;
           "chat.disableAIFeatures" = false;
           "cSpell.language"="en,de";
           "github.copilot.enable.*" = false;
