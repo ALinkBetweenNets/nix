@@ -9,4 +9,5 @@ inputs: self: super: {
       opusTools = super.opus-tools;
     };
   };
+  hermes-agent = inputs.hermes-agent.packages.${super.stdenv.hostPlatform.system}.default;
 }

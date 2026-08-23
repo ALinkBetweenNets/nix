@@ -87,6 +87,7 @@ in
     environment.systemPackages = with pkgs; [
       flake-self.inputs.compose2nix.packages.x86_64-linux.default
       flake-self.inputs.nsearch.packages.${pkgs.stdenv.hostPlatform.system}.default
+      flake-self.inputs.hermes-agent.packages.${pkgs.stdenv.hostPlatform.system}.default
       bun
       kdePackages.plasma-thunderbolt
       aha # for kde settings

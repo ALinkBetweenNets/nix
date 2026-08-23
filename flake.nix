@@ -112,6 +112,10 @@
     grub2-themes = {
       url = "github:paulmiro/grub2-themes";
     };
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
   outputs =
     {
@@ -120,6 +124,7 @@
       nur,
       nixgl,
       NixVirt,
+      hermes-agent,
       # simple-nixos-mailserver,
       ...
     }@inputs:
@@ -154,6 +159,7 @@
           # displaylink=pkgs.displaylink;
           precomp = pkgs.link.precomp;
           terminalphone = pkgs.link.terminalphone;
+          hermes-agent = inputs.hermes-agent.packages.${system}.default;
           woodpecker-pipeline = pkgs.callPackage ./pkgs/woodpecker-pipeline {
             flake-self = self;
             inputs = inputs;
@@ -225,6 +231,9 @@
               (import "${./.}/machines/pppn/configuration.nix" {
                 inherit self;
               })
+              # pppn is native aarch64; mobile-nixos' foreign binfmt registration
+              # is invalid when its target equals the configuration platform.
+              ({ boot.binfmt.registrations = {}; })
               disko.nixosModules.disko
               sops-nix.nixosModules.sops
             ];
