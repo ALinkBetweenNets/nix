@@ -82,6 +82,7 @@ with lib;
     fonts.fontconfig.enable = true;
 
     home.packages = with pkgs; [
+      opencode
       tinymist
       # bitwarden-cli
       claude-code
