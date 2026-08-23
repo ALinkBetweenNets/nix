@@ -129,7 +129,16 @@ home-manager,
     # green horizontal-stripe framebuffer corruption. nixos-hardware sets 0x10
     # (PSR only); 0x410 also disables PSR-SU + Panel Replay (the regression).
     # last-value-wins override; drop once nixos-hardware bumps 7040 to 0x410.
-    kernelParams = lib.mkAfter [ "amdgpu.dcdebugmask=0x410" ];
+    #
+    # 0x40000 (added): disables amdgpu's "custom brightness curve". Since the
+    # 7.1.x flake update, setting brightness to 100% drives the panel near
+    # black (max_brightness exports 65535 but the internal curve clamps at a
+    # lower aux max, so 100% maps below minimum). Regression tracked upstream:
+    # https://gitlab.freedesktop.org/drm/amd/-/work_items/5562 — drop 0x40000
+    # once that fix lands in the kernel.
+    # NOTE: this param is not a bitmask-OR; the last value on the cmdline wins,
+    # so all bits live here: 0x10|0x400|0x40000 = 0x40410.
+    kernelParams = lib.mkAfter [ "amdgpu.dcdebugmask=0x40410" ];
     # kernelParams = [
     #   "btusb.enable_autosuspend=0"
     #   "usbcore.autosuspend=-1"
