@@ -37,7 +37,7 @@ with lib;
       enable = true;
       enableDefaultConfig = false;
       settings = {
-        "nc" = {
+        "mn" = {
           port = 2522;
           identityFile = "~/.ssh/id_ed25519";
         };
