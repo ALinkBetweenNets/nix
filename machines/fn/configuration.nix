@@ -12,6 +12,7 @@ home-manager,
     ./hardware-configuration.nix
     home-manager.nixosModules.home-manager
     flake-self.inputs.nixos-hardware.nixosModules.framework-16-7040-amd
+    # flake-self.inputs.microvm.nixosModules.host
     # flake-self.inputs.ucodenix.nixosModules.ucodenix
   ];
   system.autoUpgrade.enable = lib.mkForce false;
@@ -43,6 +44,7 @@ home-manager,
     # eth = "wlp0s20f3";
     # nftables.enable = true;
     fail2ban.enable = true;
+    # virt-netlab.enable = true;
     podman.enable = true;
     # docker.enable = true;
     i2p.enable = true;
