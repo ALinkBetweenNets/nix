@@ -63,7 +63,7 @@ with lib;
       };
       kitty = {
         enable = true;
-        settings.shell = "${pkgs.zellij}/bin/zellij";
+        # settings.shell = "${pkgs.zellij}/bin/zellij";
         enableGitIntegration = true;
         environment = {"LS_COLORS" = "1";};
         shellIntegration.enableZshIntegration=true;
