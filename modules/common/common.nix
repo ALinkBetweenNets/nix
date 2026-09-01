@@ -121,6 +121,7 @@ in
       with pkgs;
       [
         ## system
+        codex
         openssl
         limitcpu
         nix-fast-build
