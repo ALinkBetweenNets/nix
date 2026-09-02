@@ -194,6 +194,9 @@
               }
               // inputs;
               modules = builtins.attrValues self.nixosModules ++ [
+                # virt-netlab defines microvm.* options, including when the
+                # lab itself is disabled by mkIf.
+                microvm.nixosModules.host
                 #inputs.nixos-facter-modules.nixosModules.facter
                 (import "${./.}/machines/${x}/configuration.nix" {
                   inherit self;
@@ -224,6 +227,7 @@
             }
             // inputs;
             modules = builtins.attrValues self.nixosModules ++ [
+              microvm.nixosModules.host
               "${mobile-nixos}/examples/phosh/phosh.nix"
               (import "${mobile-nixos}/lib/configuration.nix" {
                 device = "pine64-pinephonepro";
@@ -231,9 +235,11 @@
               (import "${./.}/machines/pppn/configuration.nix" {
                 inherit self;
               })
-              # pppn is native aarch64; mobile-nixos' foreign binfmt registration
-              # is invalid when its target equals the configuration platform.
-              ({ boot.binfmt.registrations = {}; })
+              # pppn is native aarch64; the shared x86 configuration's
+              # aarch64 binfmt registration is invalid on this host.
+              ({ lib, ... }: {
+                boot.binfmt.emulatedSystems = lib.mkForce [];
+              })
               disko.nixosModules.disko
               sops-nix.nixosModules.sops
             ];
