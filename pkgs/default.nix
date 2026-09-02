@@ -8,6 +8,7 @@ inputs: self: super: {
       alsaUtils = super.alsa-utils;
       opusTools = super.opus-tools;
     };
+    wifit3 = super.callPackage ./wifit3 { };
   };
   hermes-agent = inputs.hermes-agent.packages.${super.stdenv.hostPlatform.system}.default;
 }

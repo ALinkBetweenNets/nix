@@ -164,6 +164,7 @@ home-manager,
     framework-tool-tui
     fw-ectool
     framework-tool
+    link.wifit3
   ];
   #services.fprintd = {
   #  enable = true;
