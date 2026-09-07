@@ -127,6 +127,13 @@ home-manager,
   home-manager.users.l = flake-self.homeConfigurations.laptop;
   boot = {
     initrd.systemd.enable = true;
+    # wifit3 drives the ALFA AWUS036ACHM (MediaTek MT7610U) from userland.
+    # Keep the kernel's mt76x0u driver from binding the adapter or uploading
+    # firmware before wifit3 can claim the raw USB interface.
+    blacklistedKernelModules = [ "mt76x0u" ];
+    extraModprobeConfig = ''
+      install mt76x0u /bin/true
+    '';
     # Framework 16 780M: force full panel-self-refresh/Panel Replay off to stop
     # green horizontal-stripe framebuffer corruption. nixos-hardware sets 0x10
     # (PSR only); 0x410 also disables PSR-SU + Panel Replay (the regression).
@@ -155,6 +162,26 @@ home-manager,
     # b -> Reboot
     # u -> Remount everything as read only
     # r -> exit Keyboard Raw mode (in case of dead X/Wayland and frozen terminal/ non responsive keyboard)
+  };
+  # Give l (a member of wheel) access to the exact USB node used by the
+  # AWUS036ACHM. This is the declarative equivalent of wifit3's one-time
+  # Linux setup dialog; no pkexec/sudo prompt is needed at runtime.
+  services.udev.extraRules = ''
+    SUBSYSTEM=="usb", ATTR{idVendor}=="0e8d", ATTR{idProduct}=="7610", GROUP="wheel", MODE="0660", TAG+="uaccess"
+  '';
+  # The adapter may already be bound on the running installation. Release it
+  # when this configuration is activated so the declarative handoff takes
+  # effect without requiring a failed wifit3 setup dialog first.
+  system.activationScripts.wifit3-mt7610u = {
+    deps = [ "etc" ];
+    text = ''
+      ${pkgs.systemd}/bin/udevadm control --reload-rules
+      if ${pkgs.kmod}/bin/lsmod | ${pkgs.gnugrep}/bin/grep -q '^mt76x0u '; then
+        ${pkgs.kmod}/bin/modprobe -r mt76x0u 2>/dev/null || true
+      fi
+      ${pkgs.systemd}/bin/udevadm trigger --subsystem-match=usb --attr-match=idVendor=0e8d --attr-match=idProduct=7610 2>/dev/null || true
+      ${pkgs.systemd}/bin/udevadm settle 2>/dev/null || true
+    '';
   };
   #powerManagement.scsiLinkPolicy = "med_power_with_dipm";
   # systemd.extraConfig = "DefaultLimitNOFILE=2048";
