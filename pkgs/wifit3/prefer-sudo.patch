@@ -1,0 +1,12 @@
+diff --git a/src/wifit3/setup/linux.py b/src/wifit3/setup/linux.py
+--- a/src/wifit3/setup/linux.py
++++ b/src/wifit3/setup/linux.py
+@@ -271,6 +271,6 @@
+ def _choose_escalation_method() -> str | None:
+-    if shutil.which("pkexec"):
+-        return "pkexec"
+     if shutil.which("sudo"):
+         return "sudo"
++    if shutil.which("pkexec"):
++        return "pkexec"
+     return None

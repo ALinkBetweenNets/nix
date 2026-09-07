@@ -16,6 +16,10 @@ python3Packages.buildPythonApplication rec {
     hash = "sha256-8iKdUz4E6+dylZluMFnOAVCeYd5+CuPqMCNamYFVQio=";
   };
 
+  # NixOS exposes pkexec without the setuid bit, so the upstream preference
+  # for it makes the setup dialog fail before sudo is tried.
+  patches = [ ./prefer-sudo.patch ];
+
   build-system = with python3Packages; [
     hatchling
   ];
