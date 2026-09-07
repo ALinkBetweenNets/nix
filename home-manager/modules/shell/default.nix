@@ -203,7 +203,7 @@ in
           nip = "zen https://search.nixos.org/packages";
           nio = "zen https://search.nixos.org/options";
           i = "ip -br a";
-          yt = "yt-dlp --yes-playlist --extract-audio --audio-quality 0 --restrict-filenames --windows-filenames --audio-multistreams  --embed-thumbnail  --embed-subs --cookies-from-browser firefox:4tl5w0cd.default --progress --check-formats --embed-chapters --sponsorblock-remove sponsor,intro,outro,selfpromo,preview,filler --sleep-requests 10 --retry-sleep 60 -R 20 --sleep-interval 10";
+          yt = "yt-dlp --yes-playlist --extract-audio --audio-quality 0 --audio-format opus --restrict-filenames --audio-multistreams  --embed-thumbnail  --embed-subs --cookies-from-browser firefox:4tl5w0cd.default --progress --check-formats --embed-chapters --sponsorblock-remove sponsor,intro,outro,selfpromo,preview,filler --sleep-requests 10 --retry-sleep 60 -R 20 --sleep-interval 10";
           spk = "~/s/speak.sh";
           dupl = "fdupes -rdnAst .";
           sm = "sm -i";
