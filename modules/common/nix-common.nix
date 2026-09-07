@@ -27,6 +27,7 @@
   boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
   home-manager = {
     useUserPackages = true;
+    backupFileExtension = ".bkp";
     extraSpecialArgs = {
       inherit flake-self;
       # Pass system configuration (top-level "config") to home-manager modules,
