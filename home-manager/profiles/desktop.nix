@@ -45,7 +45,7 @@ with lib;
           -- config.inactive_titlebar_bg = '#1d9623'
           --config.tab_bar.inactive_tab_edge = '#2a3ba6'
           --config.hide_tab_bar_if_only_one_tab = true
-          config.font_size = 12.0
+          config.font_size = 10.0
           config.hide_tab_bar_if_only_one_tab = true
           config.enable_kitty_keyboard = true
           config.enable_wayland = true
@@ -69,6 +69,7 @@ with lib;
         shellIntegration.enableZshIntegration=true;
         font = {
           name="FiraCode Nerd Font";
+          size=10;
         };
         keybindings ={
           # "ctrl+shift+f"="SplitVertical={domain=\"CurrentPaneDomain\"}";
