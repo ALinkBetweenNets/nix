@@ -7,7 +7,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    # nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nur.url = "github:nix-community/NUR";
     # Pure Nix flake utility functions
@@ -195,6 +195,7 @@
               // inputs;
               modules = builtins.attrValues self.nixosModules ++ [
                 #inputs.nixos-facter-modules.nixosModules.facter
+                microvm.nixosModules.host
                 (import "${./.}/machines/${x}/configuration.nix" {
                   inherit self;
                   #config.facter.reportPath = ./facter.json;
@@ -224,6 +225,7 @@
             }
             // inputs;
             modules = builtins.attrValues self.nixosModules ++ [
+              microvm.nixosModules.host
               "${mobile-nixos}/examples/phosh/phosh.nix"
               (import "${mobile-nixos}/lib/configuration.nix" {
                 device = "pine64-pinephonepro";
@@ -231,9 +233,6 @@
               (import "${./.}/machines/pppn/configuration.nix" {
                 inherit self;
               })
-              # pppn is native aarch64; mobile-nixos' foreign binfmt registration
-              # is invalid when its target equals the configuration platform.
-              ({ boot.binfmt.registrations = {}; })
               disko.nixosModules.disko
               sops-nix.nixosModules.sops
             ];

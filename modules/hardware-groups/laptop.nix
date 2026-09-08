@@ -1,6 +1,7 @@
 {
   config,
   flake-self,
+  nixpkgs-stable,
   system-config,
   pkgs,
   lib,
@@ -9,6 +10,10 @@
 with lib;
 let
   cfg = config.link.laptop;
+  stablePkgs = import nixpkgs-stable {
+    system = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+  };
 in
 {
   options.link.laptop = {
@@ -33,6 +38,14 @@ in
       kdePackages.plasma-thunderbolt
 
     ];
+    # evdi follows kernel-internal DRM APIs, so keep it and its kernel on the
+    # stable package set while the rest of the system continues using unstable.
+    boot.kernelPackages = stablePkgs.linuxPackages;
+    # The unstable device-tree module probes a kernel attribute absent from the
+    # stable package set; these x86 laptops do not use device trees.
+    hardware.deviceTree.enable = false;
+    # Likewise, unstable expects the kernel package to expose its image target.
+    system.boot.loader.kernelFile = "bzImage";
     boot.extraModulePackages = [ config.boot.kernelPackages.evdi ];
     boot.initrd.kernelModules = [ "evdi" ];
     environment.variables = {
