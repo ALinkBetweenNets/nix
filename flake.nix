@@ -194,6 +194,9 @@
               }
               // inputs;
               modules = builtins.attrValues self.nixosModules ++ [
+                # virt-netlab defines microvm.* options, including when the
+                # lab itself is disabled by mkIf.
+                microvm.nixosModules.host
                 #inputs.nixos-facter-modules.nixosModules.facter
                 microvm.nixosModules.host
                 (import "${./.}/machines/${x}/configuration.nix" {
