@@ -1,6 +1,41 @@
-{ self, ... }:{ config, lib, pkgs, flake-self, home-manager, ... }: {
-  imports =
-    [ ./hardware-configuration.nix home-manager.nixosModules.home-manager ];
+{ self, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  flake-self,
+  home-manager,
+  mobile-nixos,
+  ...
+}:
+let
+  mobileKernel = pkgs.callPackage "${mobile-nixos}/devices/pine64-pinephonepro/kernel" { };
+  kernelModuleMakeFlags = import (pkgs.path + "/pkgs/os-specific/linux/kernel/common-flags.nix") {
+    inherit lib;
+    inherit (pkgs) buildPackages;
+    stdenv = mobileKernel.stdenv;
+  };
+in
+{
+  imports = [
+    ./hardware-configuration.nix
+    home-manager.nixosModules.home-manager
+  ];
+  # Mobile NixOS' kernel builder predates passthru metadata now required by
+  # nixpkgs' linuxPackagesFor.
+  mobile.boot.stage-1.kernel.package = lib.mkForce (
+    mobileKernel.overrideAttrs (
+      finalAttrs: old: {
+        passthru = old.passthru // {
+          dev = finalAttrs.finalPackage;
+          commonMakeFlags = kernelModuleMakeFlags;
+          isLTS = false;
+          isZen = false;
+          moduleBuildDependencies = [ ];
+        };
+      }
+    )
+  );
   home-manager.users.l = flake-self.homeConfigurations.desktop;
   link = {
     desktop.enable = true;
@@ -41,8 +76,13 @@
   users.users."l" = {
     isNormalUser = true;
     description = "l";
-    hashedPassword =
-      "$6$.p.3CNgeNfys/lfs$C5ey0R0CMDlcebtek9bKoCfetajpwmvMG5LqRXzgFGOmLGqsvV.xTVcUtDKtj/c9WJRlv7WDyxIzU2BitOXIy1";
-    extraGroups = [ "dialout" "feedbackd" "networkmanager" "video" "wheel" ];
+    hashedPassword = "$6$.p.3CNgeNfys/lfs$C5ey0R0CMDlcebtek9bKoCfetajpwmvMG5LqRXzgFGOmLGqsvV.xTVcUtDKtj/c9WJRlv7WDyxIzU2BitOXIy1";
+    extraGroups = [
+      "dialout"
+      "feedbackd"
+      "networkmanager"
+      "video"
+      "wheel"
+    ];
   };
 }

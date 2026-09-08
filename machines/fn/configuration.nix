@@ -47,7 +47,7 @@ home-manager,
     # virt-netlab.enable = true;
     podman.enable = true;
     # docker.enable = true;
-    i2p.enable = true;
+    # i2p.enable = true;
     # services.ollama.enable = true;
     services.restic-client = {
       enable = true;

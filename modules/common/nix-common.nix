@@ -24,7 +24,7 @@
     };
     # stateVersion = "23.11";
   };
-  boot.binfmt.emulatedSystems = [ "aarch64-linux" ];
+  boot.binfmt.emulatedSystems = lib.optional (!pkgs.stdenv.hostPlatform.isAarch64) "aarch64-linux";
   home-manager = {
     useUserPackages = true;
     backupFileExtension = ".bkp";

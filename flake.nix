@@ -7,7 +7,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
-    # nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-26.05";
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
     nur.url = "github:nix-community/NUR";
     # Pure Nix flake utility functions
@@ -198,6 +198,7 @@
                 # lab itself is disabled by mkIf.
                 microvm.nixosModules.host
                 #inputs.nixos-facter-modules.nixosModules.facter
+                microvm.nixosModules.host
                 (import "${./.}/machines/${x}/configuration.nix" {
                   inherit self;
                   #config.facter.reportPath = ./facter.json;
@@ -234,11 +235,6 @@
               })
               (import "${./.}/machines/pppn/configuration.nix" {
                 inherit self;
-              })
-              # pppn is native aarch64; the shared x86 configuration's
-              # aarch64 binfmt registration is invalid on this host.
-              ({ lib, ... }: {
-                boot.binfmt.emulatedSystems = lib.mkForce [];
               })
               disko.nixosModules.disko
               sops-nix.nixosModules.sops
