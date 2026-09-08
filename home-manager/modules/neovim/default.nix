@@ -244,7 +244,6 @@ with lib;
         };
         minimap = {
           # minimap-vim.enable = true;
-          codewindow.enable = false; # lighter, faster, and uses lua for configuration
         };
         dashboard = {
           # dashboard-nvim.enable = true;
@@ -317,10 +316,6 @@ with lib;
           colorizer.enable = true;
           modes-nvim.enable = false; # the theme looks terrible with catppuccin
           illuminate.enable = true;
-          breadcrumbs = {
-            enable = false;
-            navbuddy.enable = true;
-          };
           smartcolumn = {
             enable = false;
             setupOpts.custom_colorcolumn = {
@@ -336,6 +331,7 @@ with lib;
           };
           fastaction.enable = true;
         };
+        statusline.lualine.integrations.breadcrumbs.navbuddy.enable = true;
         keymaps = [
           {
             key = "<leader>e";
