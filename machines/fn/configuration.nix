@@ -191,6 +191,7 @@ home-manager,
     framework-tool-tui
     fw-ectool
     framework-tool
+    link.flux2-klein
     link.wifit3
   ];
   #services.fprintd = {
