@@ -122,6 +122,7 @@ in
       [
         ## system
         codex
+        navi
         openssl
         limitcpu
         nix-fast-build
