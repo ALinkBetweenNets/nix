@@ -26,6 +26,7 @@ in
     services.languagetool = {
       enable = true;
       port = 8082; # internal; clients keep hitting localhost:8081 via the proxy
+      allowOrigin = "*";
     };
     systemd.services.languagetool = {
       wantedBy = lib.mkForce [ ]; # don't start at boot
