@@ -125,6 +125,11 @@ home-manager,
       };
   };
   home-manager.users.l = flake-self.homeConfigurations.laptop;
+
+  # DisplayLink/EVDI can stall KWin Wayland when atomic modesetting selects
+  # ARGB8888. PAM must set this before KWin starts.
+  environment.sessionVariables.KWIN_DRM_NO_AMS = "1";
+
   boot = {
     initrd.systemd.enable = true;
     # wifit3 drives the ALFA AWUS036ACHM (MediaTek MT7610U) from userland.
@@ -191,8 +196,10 @@ home-manager,
     framework-tool-tui
     fw-ectool
     framework-tool
+    libxkbcommon
     link.flux2-klein
     link.wifit3
+    xwayland-satellite
   ];
   #services.fprintd = {
   #  enable = true;
