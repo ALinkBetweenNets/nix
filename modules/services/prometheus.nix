@@ -101,43 +101,36 @@ in
         };
       };
     };
-    # user, group, dataDir, extraFlags, (configFile)
-    services.promtail = {
+    # Promtail reached end of life; use Alloy to collect the journal and push it
+    # to the local Loki instance instead.
+    services.alloy = {
       enable = true;
-      configuration = {
-        server = {
-          http_listen_port = 3031;
-          grpc_listen_port = 0;
-        };
-        positions = {
-          filename = "/tmp/positions.yaml";
-        };
-        clients = [
-          {
-            url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push";
-          }
-        ];
-        scrape_configs = [
-          {
-            job_name = "journal";
-            journal = {
-              max_age = "12h";
-              labels = {
-                job = "systemd-journal";
-                host = "pihole";
-              };
-            };
-            relabel_configs = [
-              {
-                source_labels = [ "__journal__systemd_unit" ];
-                target_label = "unit";
-              }
-            ];
-          }
-        ];
-      };
-      # extraFlags
     };
+    environment.etc."alloy/config.alloy".text = ''
+      loki.write "local" {
+        endpoint {
+          url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}/loki/api/v1/push"
+        }
+      }
+
+      loki.relabel "journal" {
+        forward_to = [loki.write.local.receiver]
+
+        rule {
+          source_labels = ["__journal__systemd_unit"]
+          target_label  = "unit"
+        }
+      }
+
+      loki.source.journal "journal" {
+        max_age = "12h"
+        labels = {
+          job  = "systemd-journal",
+          host = "pihole",
+        }
+        forward_to = [loki.relabel.journal.receiver]
+      }
+    '';
     services.prometheus = {
       enable = true;
       port = cfg.port;
