@@ -80,8 +80,44 @@ with lib;
       };
     };
     fonts.fontconfig.enable = true;
+    # services.espanso = {
+    #   # enable = true;
+    #   matches.base.matches = [
+    #     {
+    #       trigger = ":now";
+    #       replace = "It's {{currentdate}} {{currenttime}}";
+    #     }
+    #     {
+    #       trigger = ":hello";
+    #       replace = "line1\nline2";
+    #     }
+    #     {
+    #       regex = ":hi(?P<person>.*)\\.";
+    #       replace = "Hi {{person}}!";
+    #     }
 
+    #   ];
+    #   matches.global_vars.global_vars = [
+    #     {
+    #       name = "currentdate";
+    #       type = "date";
+    #       params = {
+    #         format = "%d/%m/%Y";
+    #       };
+    #     }
+    #     {
+    #       name = "currenttime";
+    #       type = "date";
+    #       params = {
+    #         format = "%R";
+    #       };
+    #     }
+
+    #   ];
+    # };
     home.packages = with pkgs; [
+      omp
+      super-productivity
       opencode
       tinymist
       # bitwarden-cli
