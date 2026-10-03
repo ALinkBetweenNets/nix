@@ -22,6 +22,10 @@ in
       tailscale.enable = true;
       qmk.enable = true;
     };
+    networking.hosts = {
+      "100.74.242.30" = [ "docs.alinkbetweennets.de" ];
+      "fd7a:115c:a1e0::dd3b:f21f" = [ "docs.alinkbetweennets.de" ];
+    };
     boot.blacklistedKernelModules = [ "hackrf" ];
     services.languagetool = {
       enable = true;
