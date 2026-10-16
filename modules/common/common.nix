@@ -9,6 +9,35 @@
 with lib;
 let
   cfg = config.link.common;
+  # Current nn nginx service names, its CryptPad sandbox alias, and mail.
+  # Keep both address families on Tailscale when public DNS also has AAAA records.
+  tailnetServiceNames = map (name: "${name}.alinkbetweennets.de") [
+    "autoconfig"
+    "cache"
+    "carlberg"
+    "cloud"
+    "collect"
+    "crypt"
+    "cryptui"
+    "cyber"
+    "docs"
+    "git"
+    "img"
+    "lab"
+    "login"
+    "mail"
+    "md"
+    "mta-sts"
+    "paste"
+    "restic"
+    "s"
+    "s3"
+    "sc"
+    "scp"
+    "stats"
+    "todo"
+    "up"
+  ];
 in
 {
   imports = [ nix-index-database.nixosModules.nix-index ];
@@ -77,6 +106,10 @@ in
     };
     # services.connman.wifi.backend = "iwd";
     networking = {
+      hosts = {
+        "100.74.242.30" = tailnetServiceNames;
+        "fd7a:115c:a1e0::dd3b:f21f" = tailnetServiceNames;
+      };
       #   networkmanager.wifi.backend = "iwd";
       #   wireless.iwd = {
       #     enable = true;
