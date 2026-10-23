@@ -1,0 +1,238 @@
+#!/usr/bin/env python3
+"""Run the Framework Laptop 16 quiet cooling settings until reboot."""
+
+import argparse
+import json
+import os
+from pathlib import Path
+import shutil
+import signal
+import subprocess
+import sys
+import time
+
+
+UNIT = "temporary-quiet-cooling.service"
+STATE = Path("/run/temporary-quiet-cooling")
+CPU = Path("/sys/devices/system/cpu/cpufreq")
+# 30% of the original readings, 3120 and 2891 RPM. Keep these fixed so
+# repeated activation does not keep reducing an already limited fan speed.
+FAN_CAPS = [936, 867]
+MAX_CPU_KHZ = 1_200_000
+MAX_PWM = 10
+CPU_ATTRIBUTES = (
+    "scaling_governor",
+    "scaling_max_freq",
+    "scaling_min_freq",
+    "energy_performance_preference",
+)
+
+
+def device(name):
+    for hwmon in Path("/sys/class/hwmon").glob("hwmon*"):
+        if (hwmon / "name").read_text().strip() == name:
+            return hwmon
+    raise RuntimeError(f"Required hardware monitor is missing: {name}")
+
+
+def write(filename, value):
+    filename.write_text(str(value))
+
+
+def automatic():
+    fan = device("framework_laptop")
+    errors = []
+    for index in (1, 2):
+        try:
+            # This driver treats any write as a request for automatic control.
+            write(fan / f"pwm{index}_enable", 2)
+        except OSError as error:
+            errors.append(str(error))
+    if errors:
+        raise RuntimeError("Could not restore automatic fans: " + ", ".join(errors))
+
+
+def restore():
+    errors = []
+    try:
+        automatic()
+    except (OSError, RuntimeError) as error:
+        errors.append(str(error))
+    original = json.loads((STATE / "original.json").read_text())
+    filenames = [CPU / "boost"]
+    for policy in sorted(CPU.glob("policy*")):
+        filenames.extend(policy / name for name in CPU_ATTRIBUTES)
+    for filename in filenames:
+        if str(filename) in original:
+            try:
+                write(filename, original[str(filename)])
+            except OSError as error:
+                errors.append(f"{filename}: {error}")
+    if errors:
+        raise RuntimeError("Restoration errors: " + ", ".join(errors))
+    print("Restored automatic fans and original CPU settings", flush=True)
+
+
+def active():
+    return subprocess.run(
+        ["systemctl", "is-active", "--quiet", UNIT], check=False
+    ).returncode == 0
+
+
+def start():
+    if active():
+        print(f"{UNIT} is already running. Existing limits are unchanged.")
+        return
+
+    fan = device("framework_laptop")
+    device("k10temp")
+    policies = sorted(CPU.glob("policy*"))
+    if not policies:
+        raise RuntimeError("CPU frequency controls are unavailable")
+    for index in (1, 2):
+        for name in (f"fan{index}_input", f"pwm{index}", f"pwm{index}_enable"):
+            if not (fan / name).exists():
+                raise RuntimeError(f"Required fan control is missing: {fan / name}")
+
+    original = {(str(CPU / "boost")): (CPU / "boost").read_text().strip()}
+    for policy in policies:
+        for name in CPU_ATTRIBUTES:
+            filename = policy / name
+            original[str(filename)] = filename.read_text().strip()
+        if int((policy / "cpuinfo_min_freq").read_text()) > MAX_CPU_KHZ:
+            raise RuntimeError("This CPU cannot use the configured frequency ceiling")
+
+    STATE.mkdir(mode=0o700, exist_ok=True)
+    STATE.chmod(0o700)
+    (STATE / "original.json").write_text(json.dumps(original, indent=2))
+    controller = STATE / "controller.py"
+    shutil.copyfile(Path(__file__).resolve(), controller)
+    controller.chmod(0o700)
+    interpreter = str(Path(sys.executable).resolve())
+    subprocess.run(["systemctl", "reset-failed", UNIT], capture_output=True)
+    # systemd parses ExecStopPost as a command line, so quote both paths.
+    restore_command = f'ExecStopPost="{interpreter}" "{controller}" _restore'
+    subprocess.run(
+        [
+            "systemd-run",
+            f"--unit={UNIT}",
+            "--collect",
+            "--description=Quiet cooling until reboot",
+            "--property=Restart=on-failure",
+            "--property=RestartSec=2s",
+            "--property=TimeoutStopSec=15s",
+            f"--property={restore_command}",
+            interpreter,
+            str(controller),
+            "_run",
+        ],
+        check=True,
+    )
+    print(f"Started {UNIT}. Fan caps: {FAN_CAPS} RPM. CPU ceiling: 1.2 GHz.")
+
+
+def run_controller():
+    fan = device("framework_laptop")
+    temperature_sensor = device("k10temp") / "temp1_input"
+    policies = sorted(CPU.glob("policy*"))
+    minimum = max(403_000, *(int((p / "cpuinfo_min_freq").read_text()) for p in policies))
+    limit = MAX_CPU_KHZ
+    duties = [MAX_PWM, MAX_PWM]
+    emergency = False
+    running = True
+    iteration = 0
+
+    def stop(signum, frame):
+        nonlocal running
+        running = False
+
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGINT, stop)
+    try:
+        while running:
+            temperature = int(temperature_sensor.read_text()) / 1000
+            rpms = [int((fan / f"fan{i}_input").read_text()) for i in (1, 2)]
+            if temperature >= 60:
+                limit = minimum
+            elif temperature >= 55:
+                limit = max(minimum, limit - 100_000)
+            elif temperature < 50:
+                limit = min(MAX_CPU_KHZ, limit + 100_000)
+            if temperature >= 75 and not emergency:
+                emergency = True
+                print("75 C reached, allowing automatic emergency cooling", flush=True)
+            elif temperature < 60 and emergency:
+                emergency = False
+                print("Temperature recovered, restoring quiet fan limits", flush=True)
+
+            write(CPU / "boost", 0)
+            for policy in policies:
+                write(policy / "scaling_governor", "powersave")
+                write(policy / "energy_performance_preference", "power")
+                # Lower a previously configured minimum before lowering the maximum.
+                write(policy / "scaling_min_freq", (policy / "cpuinfo_min_freq").read_text().strip())
+                write(policy / "scaling_max_freq", limit)
+
+            if emergency:
+                automatic()
+            else:
+                for index, rpm in enumerate(rpms):
+                    if rpm > FAN_CAPS[index] * 0.95:
+                        duties[index] = max(0, duties[index] - 1)
+                    elif rpm < FAN_CAPS[index] * 0.70:
+                        duties[index] = min(MAX_PWM, duties[index] + 1)
+                    write(fan / f"pwm{index + 1}", duties[index])
+
+            status = dict(
+                cpu_celsius=temperature,
+                cpu_max_khz=limit,
+                fan_rpm=rpms,
+                fan_rpm_caps=FAN_CAPS,
+                fan_pwm_percent=duties,
+                emergency_cooling=emergency,
+            )
+            temporary = STATE / "status.json.tmp"
+            temporary.write_text(json.dumps(status, indent=2) + "\n")
+            temporary.replace(STATE / "status.json")
+            if iteration % 10 == 0:
+                print(json.dumps(status), flush=True)
+            iteration += 1
+            time.sleep(3)
+    finally:
+        automatic()
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Framework Laptop 16 quiet cooling until reboot. Requires root.",
+        epilog="Fan caps: 936/867 RPM. CPU: at most 1.2 GHz, boost off. "
+        "Additional throttling starts at 55 C. Automatic emergency cooling starts at 75 C.",
+    )
+    parser.add_argument("command", nargs="?", default="start", metavar="{start,stop,status}")
+    args = parser.parse_args()
+    if args.command not in ("start", "stop", "status", "_run", "_restore"):
+        parser.error("command must be start, stop, or status")
+    if os.geteuid() != 0:
+        parser.error("run this script with sudo")
+    if args.command == "start":
+        start()
+    elif args.command == "stop":
+        subprocess.run(["systemctl", "stop", UNIT], check=True)
+    elif args.command == "status":
+        if active():
+            print(f"{UNIT} is running")
+            print((STATE / "status.json").read_text(), end="")
+        else:
+            print(f"{UNIT} is stopped")
+    elif args.command == "_restore":
+        restore()
+    else:
+        run_controller()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, RuntimeError, subprocess.CalledProcessError) as error:
+        print(f"quiet-cooling: {error}", file=sys.stderr)
+        sys.exit(1)
