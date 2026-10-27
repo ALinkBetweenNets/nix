@@ -124,6 +124,9 @@ in
           "[typescriptreact]" = {
             "editor.defaultFormatter" = "vscode.typescript-language-features";
           };
+          "[markdown]" = {
+            "editor.defaultFormatter" = "antfu.slidev";
+          };
           "[nix]" = {
             "editor.defaultFormatter" = "jnoortheen.nix-ide";
           };
