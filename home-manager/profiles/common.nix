@@ -37,6 +37,15 @@ with lib;
       enable = true;
       enableDefaultConfig = false;
       settings = {
+        "jureca" = {
+          hostName = "jureca.fz-juelich.de";
+          user = "carlberg1";
+          identityFile = "~/.ssh/hpc";
+          forwardAgent = "no";
+          controlPath = "~/.ssh/control-%h-%p-%r";
+          controlMaster = "auto";
+          controlPersist = "8h";
+        };
         "mn" = {
           port = 2522;
           identityFile = "~/.ssh/id_ed25519";
