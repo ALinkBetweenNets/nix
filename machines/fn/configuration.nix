@@ -32,6 +32,7 @@ home-manager,
     fs.btrfs.enable = true;
     # fs.luks.enable = true;
     laptop.enable = true;
+    laptop.displaylink.enable = false;
     common.enable = true;
     main.enable = true;
     cpu-amd.enable = true;
@@ -126,9 +127,9 @@ home-manager,
   };
   home-manager.users.l = flake-self.homeConfigurations.laptop;
 
-  # DisplayLink/EVDI can stall KWin Wayland when atomic modesetting selects
+    # DisplayLink/EVDI can stall KWin Wayland when atomic modesetting selects
   # ARGB8888. PAM must set this before KWin starts.
-  environment.sessionVariables.KWIN_DRM_NO_AMS = "1";
+  # environment.sessionVariables.KWIN_DRM_NO_AMS = "1";
 
   boot = {
     initrd.systemd.enable = true;

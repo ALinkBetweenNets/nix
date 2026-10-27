@@ -139,6 +139,7 @@
         system:
         import nixpkgs {
           inherit system;
+          config.allowUnfree = true;
           overlays = [
             self.overlays.default
             nur.overlays.default
@@ -156,7 +157,7 @@
           pkgs = nixpkgsFor.${system};
         in
         {
-          # displaylink=pkgs.displaylink;
+          displaylink=pkgs.displaylink;
           precomp = pkgs.link.precomp;
           terminalphone = pkgs.link.terminalphone;
           hermes-agent = inputs.hermes-agent.packages.${system}.default;
@@ -288,17 +289,6 @@
                 self.overlays.default
                 inputs.crab_share.overlay
                 inputs.nur.overlays.default
-                # (final: prev: {
-                #   displaylink = prev.displaylink.overrideAttrs  {
-                #     src = prev.fetchurl {
-                #       url =
-                #         "https://www.synaptics.com/sites/default/files/exe_files/2024-10/DisplayLink%20USB%20Graphics%20Software%20for%20Ubuntu6.1-EXE.zip";
-                #       # either pre‑run `nix-prefetch-url URL` to get this sha256,
-                #       # or let Nix error and copy the “got: sha256-…” it prints.
-                #       sha256 = "0RJgVrX+Y8Nvz106Xh+W9N9uRLC2VO00fBJeS8vs7fKw=";
-                #     };
-                #   };
-                # })
                 (final: prev: {
                   cudapkgs = import inputs.nixpkgs {
                     system = "${pkgs.stdenv.hostPlatform.system}";
