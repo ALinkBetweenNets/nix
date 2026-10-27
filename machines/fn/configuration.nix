@@ -183,7 +183,6 @@ home-manager,
   # DisplayLink/EVDI is disabled on fn while testing native display output.
 
   boot = {
-    initrd.systemd.enable = true;
     # wifit3 drives the ALFA AWUS036ACHM (MediaTek MT7610U) from userland.
     # Keep the kernel's mt76x0u driver from binding the adapter or uploading
     # firmware before wifit3 can claim the raw USB interface.
