@@ -125,7 +125,7 @@ with lib;
       nextcloud-client
       pympress
       ghostty
-      zotero
+      # zotero
       openai-whisper # transcription
       ripgrep-all # also search pdfs, ebooks, office docs, zip, tar.gz
       # deskreen
