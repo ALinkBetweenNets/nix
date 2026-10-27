@@ -129,6 +129,7 @@ in
           );
         in
         {
+          s = "kitty +kitten ssh";
           colr = "${pkgs.ccze}/bin/ccze";
           nginxlogl = "sudo tail -f /var/log/nginx/forensic.log | ${pkgs.ccze}/bin/ccze -A -o nolookups";
           nginxlog = "sudo tac /var/log/nginx/forensic.log | ${pkgs.ccze}/bin/ccze -A -o nolookups | less -R";
@@ -198,7 +199,7 @@ in
           ts = "tailscale status";
           p = "python";
           b = "bat";
-          s = "sudo";
+          sd = "sudo";
           search = "links https://duckduckgo.com/";
           nip = "zen https://search.nixos.org/packages";
           nio = "zen https://search.nixos.org/options";
