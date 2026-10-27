@@ -198,6 +198,7 @@ with lib;
     home.packages =
       with pkgs;
       [
+        mutagen
         neovide # neovim frontend
         ## Basics
         nfs-utils
