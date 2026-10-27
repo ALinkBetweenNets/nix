@@ -197,7 +197,15 @@ in {
           # of usage, one where we add a digital clock, setting 12h time and
           # first day of the week to sunday and another adding a systray with
           # some modifications in which entries to show.
-          { digitalClock = { }; }
+          {
+            digitalClock = {
+              date.format = "isoDate";
+              time = {
+                format = "24h";
+                showSeconds = "never";
+              };
+            };
+          }
           "org.kde.plasma.marginsseparator"
           "org.kde.plasma.appmenu"
           "org.kde.plasma.marginsseparator"
