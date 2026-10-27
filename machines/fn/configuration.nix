@@ -244,6 +244,7 @@ home-manager,
   # systemd.extraConfig = "DefaultLimitNOFILE=2048";
   # security.protectKernelImage = false;
   environment.systemPackages = with pkgs; [
+    bubblewrap
     kdePackages.frameworkintegration
     framework-tool-tui
     fw-ectool
