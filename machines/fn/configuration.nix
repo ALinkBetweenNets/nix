@@ -131,6 +131,57 @@ home-manager,
   # ARGB8888. PAM must set this before KWin starts.
   # environment.sessionVariables.KWIN_DRM_NO_AMS = "1";
 
+  # OBS publishes with WHIP at http://127.0.0.1:8889/screen/whip.
+  # LAN viewers open http://<fn-lan-ip>:8889/screen in a browser.
+  services.mediamtx = {
+    enable = true;
+    settings = {
+      rtsp = false;
+      rtmp = false;
+      hls = false;
+      srt = false;
+      moq = false;
+
+      webrtc = true;
+      webrtcAddress = ":8889";
+      webrtcLocalUDPAddress = ":8189";
+      webrtcIPsFromInterfaces = true;
+      webrtcIPsFromInterfacesList = [
+        "lo"
+        "eth0"
+        "wlp1s0"
+      ];
+
+      paths.screen.source = "publisher";
+      authInternalUsers = [
+        {
+          user = "any";
+          ips = [
+            "127.0.0.1"
+            "::1"
+          ];
+          permissions = [
+            {
+              action = "publish";
+              path = "screen";
+            }
+          ];
+        }
+        {
+          user = "any";
+          permissions = [
+            {
+              action = "read";
+              path = "screen";
+            }
+          ];
+        }
+      ];
+    };
+  };
+
+  # DisplayLink/EVDI is disabled on fn while testing native display output.
+
   boot = {
     initrd.systemd.enable = true;
     # wifit3 drives the ALFA AWUS036ACHM (MediaTek MT7610U) from userland.
@@ -218,6 +269,16 @@ home-manager,
     firewall = {
       allowedTCPPorts = [ 60955 ];
       allowedUDPPorts = [ 60955 ];
+      interfaces = {
+        eth0 = {
+          allowedTCPPorts = [ 8889 ];
+          allowedUDPPorts = [ 8189 ];
+        };
+        wlp1s0 = {
+          allowedTCPPorts = [ 8889 ];
+          allowedUDPPorts = [ 8189 ];
+        };
+      };
     };
     hostName = "fn";
     domain = "monitor-banfish.ts.net";
@@ -227,7 +288,7 @@ home-manager,
   # starts the real server (internal port 8082) on first use and lets it stop
   # when idle. First request after idle pays the JVM startup delay (~seconds).
   # proxyd because LanguageTool's server can't accept socket fds itself.
-  
+
   # services.ucodenix = {
   #   enable = true;
   #   cpuSerialNumber =
